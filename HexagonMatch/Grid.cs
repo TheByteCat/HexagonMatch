@@ -1,18 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 
 namespace HexagonMatch
 {
@@ -21,12 +13,20 @@ namespace HexagonMatch
         List<Hexagon> selectedHex;
         Hexagon[,] hexMap;
         short hexagonSize = 50;
-        int mapRadius, score = 0;
+        int mapRadius;
         byte maxValue;
         Hexagon lastHexagon, prevHexagon;
         Vector2 normalScale;
         Random rand;
         static float Sqrt3 = (float)Math.Sqrt(3);
+        Texture2D hexagonTexture;
+        public static Color[] colors = { Color.LightSkyBlue, Color.SeaGreen, Color.White, Color.MediumTurquoise, Color.Aqua, Color.LightGreen };
+        public static Texture2D Elements;
+
+        public delegate void normalizeStartDelegat(Grid grid);
+        public event normalizeStartDelegat NormalizeStart;
+        public delegate void normalizeEndDelegat(Grid grid);
+        public event normalizeEndDelegat NormalizeEnd;
 
         public Vector2 Center
         {
@@ -69,17 +69,36 @@ namespace HexagonMatch
                 hexMap = value;
             }
         }
-        public int Score
+        public Texture2D HexagonTexture
         {
             get
             {
-                return score;
+                return hexagonTexture;
             }
 
             set
             {
-                score = value;
+                hexagonTexture = value;
+                NormalScale = new Vector2((2.0f * HexagonSize) / hexagonTexture.Width, (Sqrt3 * HexagonSize) / hexagonTexture.Height);
             }
+        }
+        internal List<Hexagon> SelectedHex
+        {
+            get
+            {
+                return selectedHex;
+            }
+        }
+
+        public static Rectangle ElementSource(int index)
+        {
+            int size = Elements.Height;
+            return new Rectangle(size * index, 0, size, size);
+        }
+        public static Rectangle ElementSource(HexagonElement index)
+        {
+            int size = Elements.Height;
+            return new Rectangle(size * (int)index, 0, size, size);
         }
 
         private Hex PixelToHex(Vector2 position)
@@ -130,11 +149,13 @@ namespace HexagonMatch
         }
         public void AddHexagon(Hexagon h)
         {
-            hexMap[h.Q + mapRadius, h.R + mapRadius] = h;
+            if (h != null)
+                hexMap[h.Q + mapRadius, h.R + mapRadius] = h;
         }
         public void RemoveHexagon(Hexagon h)
         {
-            hexMap[h.Q + mapRadius, h.R + mapRadius] = null;
+            if (h != null)
+                hexMap[h.Q + mapRadius, h.R + mapRadius] = null;
         }
 
         public Grid(short hexagonSize, Vector2 center, byte maxValue, Vector2 scale, int mapRadius = 3)
@@ -142,17 +163,12 @@ namespace HexagonMatch
             this.hexagonSize = hexagonSize;
             Center = center;
             hexMap = new Hexagon[mapRadius * 2 + 1, mapRadius * 2 + 1];
-            selectedHex = new List<Hexagon>((mapRadius * 2 + 1) *(mapRadius * 2 + 1));
+            selectedHex = new List<Hexagon>((mapRadius * 2 + 1) * (mapRadius * 2 + 1));
             this.maxValue = maxValue;
             this.mapRadius = mapRadius;
             normalScale = scale;
             rand = new Random();
         }
-
-        //public Hexagon Neighbor(Hexagon a, int direction)
-        //{
-        //    return HexToHexagon(Hex.Neighbor(a.Hex, direction));
-        //}
 
         private void NormalizeCell(Hex h)
         {
@@ -167,7 +183,7 @@ namespace HexagonMatch
                     SetHexagonByHex(GetHexagonByHex(nextHex), currHex);
                     currHex = nextHex;
                 }
-                SetHexagonByHex(new Hexagon(currHex, (byte)(rand.Next(maxValue) + 1), hexagonSize, Game1.colors[rand.Next(Game1.colors.Length)]), currHex);
+                SetHexagonByHex(new Hexagon(currHex, new HexagonContent(HexagonType.Element, (HexagonElement)rand.Next(maxValue))), currHex);
             }
         }
 
@@ -182,29 +198,39 @@ namespace HexagonMatch
             }
         }
 
+        private bool IsValidNextHexagon(Hexagon h)
+        {
+            return (h != lastHexagon) &&
+                Hexagon.IsNeighbor(lastHexagon, h) &&
+                h.Content.Type == HexagonType.Element &&
+                h.Content.Element == lastHexagon.Content.Element &&
+                !selectedHex.Contains(h);
+        }
+
         public void Update(GameTime gameTime, TouchCollection touch)
         {
-            if (touch.Count == 1)
+            if (touch.Count != 0)
             {
                 Hexagon h = PixelToHexagon(touch[0].Position);
                 if (h != null)
                 {
                     if (lastHexagon == null)
                     {
-                        h.CurrentColor = Color.Violet;
+                        h.CurrentColor = Color.Maroon;
                         selectedHex.Add(h);
+                        prevHexagon = null;
                         lastHexagon = h;
                     }
                     else if (h == prevHexagon)
                     {
-                        lastHexagon.CurrentColor = lastHexagon.BaseColor;
+                        lastHexagon.CurrentColor = Color.White;
                         selectedHex.Remove(selectedHex.Last());
                         lastHexagon = prevHexagon;
                         prevHexagon = selectedHex.Count > 1 ? selectedHex[selectedHex.Count - 2] : null;
                     }
-                    else if ((h != lastHexagon) && Hexagon.IsNeighbor(lastHexagon, h) && (Math.Abs(h.Value - lastHexagon.Value) == 1 || Math.Abs(h.Value - lastHexagon.Value) == maxValue - 1))
+                    else if (IsValidNextHexagon(h))
                     {
-                        h.CurrentColor = Color.Violet;
+                        h.CurrentColor = Color.Maroon;
                         selectedHex.Add(h);
                         prevHexagon = lastHexagon;
                         lastHexagon = h;
@@ -215,32 +241,43 @@ namespace HexagonMatch
             {
                 if (selectedHex.Count > 2)
                 {
-                    score += selectedHex.Count * 5;
                     foreach (Hexagon h in selectedHex)
+                    {
                         SetHexagonByHex(null, h.Hex);
+                    }
+                    NormalizeStart?.Invoke(this);
                     Normalize();
+                    NormalizeEnd?.Invoke(this);
                 }
                 else
                 {
                     foreach (Hexagon h in selectedHex)
-                        h.CurrentColor = h.BaseColor;
+                        h.CurrentColor = Color.White;
                 }
                 selectedHex.Clear();
-                lastHexagon = prevHexagon = null;
-                //prevHexagon = null;
+                lastHexagon = null;
+                prevHexagon = null;
             }
         }
 
         public void Draw(SpriteBatch spriteBatch, SpriteFont font)
         {
-            spriteBatch.Begin();            
+            spriteBatch.Begin();
             foreach (Hexagon h in hexMap)
             {
                 if (h != null)
                 {
-                    spriteBatch.Draw(Hexagon.Texture, position: h.Position, scale: h.Scale, color: h.CurrentColor);
-                    var size = font.MeasureString(h.Value.ToString()) * normalScale.X / 2;
-                    spriteBatch.DrawString(font, h.Value.ToString(), h.Center - size, Color.Black, 0, Vector2.Zero, normalScale.X, SpriteEffects.None, 0);
+                    spriteBatch.Draw(hexagonTexture, position: h.Position, scale: h.Scale, color: h.CurrentColor);
+                    if(h.Content.Type == HexagonType.Element)
+                    {
+                        spriteBatch.Draw(Elements, 
+                            position: h.Center - new Vector2(Elements.Height / 2.0f) * h.Scale, 
+                            sourceRectangle: ElementSource(h.Content.Element), 
+                            scale: h.Scale,// * new Vector2(hexagonTexture.Height / Elements.Height) , 
+                            color: Color.White);
+                    }
+                    //var size = font.MeasureString(h.Value.ToString()) * normalScale.X / 2;
+                    //spriteBatch.DrawString(font, h.Value.ToString(), h.Center - size, Color.Black, 0, Vector2.Zero, normalScale.X, SpriteEffects.None, 0);
                 }
             }
             spriteBatch.End();

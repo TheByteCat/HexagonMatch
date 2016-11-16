@@ -1,21 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-
 namespace HexagonMatch
 {
-    struct Hex
+    class Hex
     {
         public Hex(int q, int r, int s)
         {
@@ -72,7 +63,7 @@ namespace HexagonMatch
         }
         public static bool operator ==(Hex h1, Hex h2)
         {
-            return (h1.q == h2.q) && (h1.r == h2.r) && (h1.s == h2.s); 
+            return (h1.q == h2.q) && (h1.r == h2.r) && (h1.s == h2.s);
         }
         public static bool operator !=(Hex h1, Hex h2)
         {
@@ -90,17 +81,69 @@ namespace HexagonMatch
         {
             return directions.Contains(a - b);
         }
+        public override bool Equals(object obj)
+        {
+            return this == (Hex)obj;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
+    enum HexagonType { Empty = 0, Element, Block }
+    enum HexagonElement { None = -1, Blue = 0, Brown, Green, Grey, Leaf, Water, Violet, LightGreen, Orange };
+
+    struct HexagonContent
+    {
+        HexagonType type;
+        HexagonElement element;
+
+        internal HexagonType Type
+        {
+            get
+            {
+                return type;
+            }
+
+            set
+            {
+                type = value;
+                if (value == HexagonType.Block || value == HexagonType.Empty)
+                    element = HexagonElement.None;
+            }
+        }
+        internal HexagonElement Element
+        {
+            get
+            {
+                if (type == HexagonType.Block || type == HexagonType.Empty)
+                    return HexagonElement.None;
+                else
+                    return element;
+            }
+
+            set
+            {
+                element = value;
+                if (value == HexagonElement.None)
+                    type = HexagonType.Empty;
+            }
+        }
+
+        public HexagonContent(HexagonType type = HexagonType.Empty, HexagonElement element = HexagonElement.None)
+        {
+            this.type = type;
+            this.element = element;
+        }
+    }
 
     class Hexagon
     {
         Hex hex;
-        short size;
-        byte value;
-        Color color;
+        Color currentColor;
+        public HexagonContent Content;
 
-        static Texture2D texture;
         static float sqrt3 = (float)Math.Sqrt(3);
         private static Grid ownerGrid;
         internal static Grid OwnerGrid
@@ -113,15 +156,6 @@ namespace HexagonMatch
             set
             {
                 ownerGrid = value;
-            }
-        }
-        public static Texture2D Texture
-        {
-            get { return texture; }
-            set
-            {
-                texture = value;
-                ownerGrid.NormalScale = new Vector2((2.0f * ownerGrid.HexagonSize) / Hexagon.Texture.Width, (sqrt3 * ownerGrid.HexagonSize) / Hexagon.Texture.Height);
             }
         }
         public static Hex HexRound(float Q, float R, float S)
@@ -153,14 +187,14 @@ namespace HexagonMatch
                 return Hex.IsNeighbor(a.Hex, b.Hex);
             else
                 return false;
-        }        
-        
+        }
+
         public Vector2 Position
         {
             get
             {
-                float x = size * 3.0f / 2.0f * hex.q - size;
-                float y = size * sqrt3 * (hex.r + hex.q / 2.0f) - sqrt3 / 2.0f * size;
+                float x = ownerGrid.HexagonSize * 3.0f / 2.0f * hex.q - ownerGrid.HexagonSize;
+                float y = ownerGrid.HexagonSize * sqrt3 * (hex.r + hex.q / 2.0f) - sqrt3 / 2.0f * ownerGrid.HexagonSize;
                 return new Vector2(x, y) + ownerGrid.Center;
             }
         }
@@ -173,7 +207,7 @@ namespace HexagonMatch
         }
         public Vector2 Scale
         {
-            get { return new Vector2((2.0f * size) / Hexagon.Texture.Width, (sqrt3 * size) / Hexagon.Texture.Height); }
+            get { return new Vector2((2.0f * ownerGrid.HexagonSize) / Texture.Width, (sqrt3 * ownerGrid.HexagonSize) / Texture.Height); }
         }
         public int Q { get { return hex.q; } }
         public int R { get { return hex.r; } }
@@ -190,64 +224,34 @@ namespace HexagonMatch
                 hex = value;
             }
         }
-        public byte Value
+        public Texture2D Texture
         {
-            get
-            {
-                return value;
-            }
-
-            set
-            {
-                this.value = value;
-            }
-        }
-        public short Size
-        {
-            get
-            {
-                return size;
-            }
-
-            set
-            {
-                size = value;
-            }
-        }
-        public Color BaseColor
-        {
-            get
-            {
-                return color;
-            }
-
-            set
-            {
-                color = value;
-                CurrentColor = value;
-            }
-        }
+            get { return ownerGrid.HexagonTexture; }
+        }       
         public Color CurrentColor
         {
-            get;
-            set;
+            get
+            {
+                return currentColor;
+            }
+
+            set
+            {
+                currentColor = value;
+            }
         }
 
-        public Hexagon(Hex hex, byte value, short size, Color color)
+        public Hexagon(Hex hex, HexagonContent type)
         {
             this.hex = hex;
-            this.value = value;
-            this.size = size;
-            this.color = color;
-            CurrentColor = color;
+            currentColor = Color.White;
+            this.Content = type;
         }
-        public Hexagon(Vector3 hex, byte value, short size, Color color)
+        public Hexagon(Point hex, HexagonContent type)
         {
-            this.hex = new Hex((int)hex.X, (int)hex.Y, (int)hex.Z);
-            this.value = value;
-            this.size = size;
-            this.color = color;
-            CurrentColor = color;
+            this.hex = new Hex(hex.X, hex.Y, (-1) * hex.X - hex.Y);
+            currentColor = Color.White;
+            Content = type;
         }
     }
 }
