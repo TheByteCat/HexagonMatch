@@ -110,6 +110,11 @@ namespace HexagonMatch.Scenes
                 }
             }
             //
+            grid.GetHex(new Hex(-2, 1, 1)).Content = HexagonContent.Block;
+            grid.GetHex(new Hex(2, -1, -1)).Content = HexagonContent.Block;
+            //grid.GetHex(new Hex(-1, 0, 1)).Content = HexagonContent.Block;
+            //grid.GetHex(new Hex(0, 0, 0)).Content = HexagonContent.Block;
+            //
             grid.NormalizeStart += Grid_NormalizeStart;
             base.Initialize();
         }

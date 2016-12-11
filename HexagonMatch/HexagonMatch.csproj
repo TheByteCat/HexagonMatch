@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Activity1.cs" />
     <Compile Include="Enemy.cs" />
+    <Compile Include="GridAnimator.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="Grid.cs" />

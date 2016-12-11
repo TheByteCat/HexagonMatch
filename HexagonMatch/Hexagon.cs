@@ -136,6 +136,22 @@ namespace HexagonMatch
             this.type = type;
             this.element = element;
         }
+
+        public static HexagonContent Empty
+        {
+            get
+            {
+                return new HexagonContent();
+            }
+        }
+        public static HexagonContent Block
+        {
+            get
+            {
+                return new HexagonContent(HexagonType.Block);
+            }
+        }
+
     }
 
     class Hexagon
@@ -224,15 +240,32 @@ namespace HexagonMatch
                 hex = value;
             }
         }
+        public HexagonType Type
+        {
+            get
+            {
+                return Content.Type;
+            }
+
+            set
+            {
+                Content.Type = value;
+                if (value == HexagonType.Block || value == HexagonType.Empty)
+                    Content.Element = HexagonElement.None;
+            }
+        }
         public Texture2D Texture
         {
             get { return ownerGrid.HexagonTexture; }
-        }       
+        }
         public Color CurrentColor
         {
             get
             {
-                return currentColor;
+                if (Type == HexagonType.Block)
+                    return Color.DarkGray;
+                else
+                    return currentColor;
             }
 
             set

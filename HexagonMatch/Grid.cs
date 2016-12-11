@@ -138,6 +138,20 @@ namespace HexagonMatch
             else
                 return hexMap[hex.q + mapRadius, hex.r + mapRadius];
         }
+        /// <summary>
+        /// Return Hexagon from HexMap by Hex coordinates
+        /// </summary>
+        public Hexagon GetHex(Hex hex)
+        {
+            return GetHexagonByHex(hex);
+        }
+        public void SetHexInfo(Hex hex, HexagonContent info)
+        {
+            if (Math.Abs(hex.q) <= mapRadius && Math.Abs(hex.r) <= mapRadius)
+            {                
+                hexMap[hex.q + mapRadius, hex.r + mapRadius].Content = info;
+            }
+        }
         public void SetHexagonByHex(Hexagon h, Hex hex)
         {
             if (Math.Abs(hex.q) <= mapRadius && Math.Abs(hex.r) <= mapRadius)
@@ -170,20 +184,62 @@ namespace HexagonMatch
             rand = new Random();
         }
 
-        private void NormalizeCell(Hex h)
+        //private void NormalizeCell(Hex h)
+        //{
+        //    if (GetHexagonByHex(h).Content.Type == HexagonType.Empty)
+        //    {
+        //        Hex nextHex = h, currHex = h;
+        //        while (currHex.r > -mapRadius && currHex.s < mapRadius)
+        //        {
+        //            nextHex = Hex.Neighbor(currHex, 2);
+        //            Hexagon next = GetHexagonByHex(nextHex);
+        //            if (next != null)
+        //            {
+        //                if (next.Content.Type == HexagonType.Empty)
+        //                {
+        //                    NormalizeCell(nextHex);
+        //                }
+        //                if(next.Type == HexagonType.Block)
+        //                {
+        //                    Hex rightHex = Hex.Neighbor(currHex, 1);
+        //                    Hex leftHex = Hex.Neighbor(currHex, 3);
+        //                    NormalizeCell(rightHex);
+        //                    NormalizeCell(leftHex);
+        //                    //TODO fix
+        //                }
+        //                SetHexInfo(currHex, next.Content);
+        //                currHex = nextHex;
+        //            }
+        //        }
+        //        SetHexInfo(currHex, new HexagonContent(HexagonType.Element, (HexagonElement)rand.Next(maxValue)));
+        //    }
+        //}             
+
+        public void FieldCell(Hex hex)
         {
-            if (GetHexagonByHex(h) == null)
+            Hexagon h = GetHex(hex);
+            if(h.Type == HexagonType.Empty)
             {
-                Hex nextHex = h, currHex = h;
-                while (currHex.r > -mapRadius && currHex.s < mapRadius)
+                if(h.S == mapRadius || h.R == -mapRadius)
                 {
-                    nextHex = Hex.Neighbor(currHex, 2);
-                    if (GetHexagonByHex(nextHex) == null)
-                        NormalizeCell(nextHex);
-                    SetHexagonByHex(GetHexagonByHex(nextHex), currHex);
-                    currHex = nextHex;
+                    SetHexInfo(hex, new HexagonContent(HexagonType.Element, (HexagonElement)rand.Next(maxValue)));
                 }
-                SetHexagonByHex(new Hexagon(currHex, new HexagonContent(HexagonType.Element, (HexagonElement)rand.Next(maxValue))), currHex);
+                else
+                {
+                    HexagonContent hexContent = HexagonContent.Empty;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Hexagon tempHex = GetHex(Hex.Neighbor(hex, ((i + 1) % 3) + 1));//get hex in order : up -> left-up -> right-up
+                        if (tempHex != null && tempHex.Type != HexagonType.Block)
+                        {
+                            hexContent = tempHex.Content;
+                            tempHex.Content = HexagonContent.Empty;
+                            FieldCell(tempHex.Hex);
+                            break;
+                        }
+                    }
+                    h.Content = hexContent;
+                }
             }
         }
 
@@ -192,9 +248,23 @@ namespace HexagonMatch
         /// </summary>
         public void Normalize()
         {
-            foreach (Hexagon h in selectedHex)
+            //foreach (Hexagon h in selectedHex)
+            //{
+            //    NormalizeCell(h.Hex);
+            //}
+            for (int layer = mapRadius; layer >= -mapRadius ; layer--)
             {
-                NormalizeCell(h.Hex);
+                Hex upperHex = new Hex(0, (-1) * layer, layer);
+                FieldCell(upperHex);//Field upper cell in leyer
+                Hex leftHex = Hex.Neighbor(upperHex, 4);
+                Hex rightHex = Hex.Neighbor(upperHex, 0);
+                for (int i = 0; i < mapRadius + Math.Min(0, layer); i++)
+                {
+                    FieldCell(leftHex);
+                    FieldCell(rightHex);
+                    leftHex = Hex.Neighbor(leftHex, 4);
+                    rightHex = Hex.Neighbor(rightHex, 0);
+                }
             }
         }
 
@@ -243,7 +313,8 @@ namespace HexagonMatch
                 {
                     foreach (Hexagon h in selectedHex)
                     {
-                        SetHexagonByHex(null, h.Hex);
+                        SetHexInfo(h.Hex, HexagonContent.Empty);
+                        h.CurrentColor = Color.White;
                     }
                     NormalizeStart?.Invoke(this);
                     Normalize();
@@ -268,11 +339,11 @@ namespace HexagonMatch
                 if (h != null)
                 {
                     spriteBatch.Draw(hexagonTexture, position: h.Position, scale: h.Scale, color: h.CurrentColor);
-                    if(h.Content.Type == HexagonType.Element)
+                    if (h.Content.Type == HexagonType.Element)
                     {
-                        spriteBatch.Draw(Elements, 
-                            position: h.Center - new Vector2(Elements.Height / 2.0f) * h.Scale, 
-                            sourceRectangle: ElementSource(h.Content.Element), 
+                        spriteBatch.Draw(Elements,
+                            position: h.Center - new Vector2(Elements.Height / 2.0f) * h.Scale,
+                            sourceRectangle: ElementSource(h.Content.Element),
                             scale: h.Scale,// * new Vector2(hexagonTexture.Height / Elements.Height) , 
                             color: Color.White);
                     }
