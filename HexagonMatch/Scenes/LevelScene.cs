@@ -115,6 +115,8 @@ namespace HexagonMatch.Scenes
             //grid.GetHex(new Hex(-1, 0, 1)).Content = HexagonContent.Block;
             //grid.GetHex(new Hex(0, 0, 0)).Content = HexagonContent.Block;
             //
+
+            grid.CopyMapToBuffer();
             grid.NormalizeStart += Grid_NormalizeStart;
             base.Initialize();
         }
@@ -136,6 +138,14 @@ namespace HexagonMatch.Scenes
             grid.Update(gameTime, touch);
             gui.Update(gameTime);
             base.Update(gameTime);
+        }
+
+        private void DebugDraw(GameTime gameTime)
+        {
+            Vector2 scorePosition = new Vector2(game.CurrentScreenSize.X - scoreFont.MeasureString(gameTime.ElapsedGameTime.TotalSeconds.ToString()).X * game.Scale.X - 10, 5);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(scoreFont, gameTime.ElapsedGameTime.TotalSeconds.ToString(), scorePosition, Color.White, 0, Vector2.Zero, game.Scale.X, SpriteEffects.None, 0);
+            spriteBatch.End();
         }
 
         public override void Draw(GameTime gameTime)
@@ -162,6 +172,7 @@ namespace HexagonMatch.Scenes
             spriteBatch.End();
 
             grid.Draw(spriteBatch, game.BaseFont);//Draw hexagon grid
+            //DebugDraw(gameTime);
             gui.Draw(gameTime);
             base.Draw(gameTime);
         }

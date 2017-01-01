@@ -4,16 +4,16 @@
   <Platform>Android</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/baseFont.spritefont</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/white_hexagon.png</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/restart_ico.png</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/background_fhd.jpg</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/score_font.spritefont</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest_background.jpg</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/goblin.png</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/stones.png</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest2_background.jpg</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest3_background.jpg</File>
-    <File>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest4_background.jpg</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/baseFont.spritefont</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/white_hexagon.png</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/restart_ico.png</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/background_fhd.jpg</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/score_font.spritefont</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest_background.jpg</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/goblin.png</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/stones.png</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest2_background.jpg</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest3_background.jpg</File>
+    <File>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/forest4_background.jpg</File>
   </SourceFiles>
 </SourceFileCollection>

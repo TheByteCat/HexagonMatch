@@ -67,6 +67,7 @@ namespace HexagonMatch
             scale =new Vector2((float)currentScreenSize.X / NormalWidth, (float)currentScreenSize.Y / NormalHeight);
             //graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
             graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
+
         }
 
         /// <summary>
@@ -94,8 +95,9 @@ namespace HexagonMatch
             baseFont = Content.Load<SpriteFont>("baseFont");
 
             sceneManager = new SceneManager(this, spriteBatch, SceneTitle.Level);
-            Components.Add(sceneManager);           
-                      
+            FPSCounterComponent fps = new FPSCounterComponent(this, spriteBatch, baseFont);
+            Components.Add(sceneManager);
+            Components.Add(fps);                      
         }
 
         /// <summary>

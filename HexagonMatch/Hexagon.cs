@@ -137,6 +137,12 @@ namespace HexagonMatch
             this.element = element;
         }
 
+        public HexagonContent(HexagonElement element)
+        {
+            type = HexagonType.Element;
+            this.element = element;
+        }
+
         public static HexagonContent Empty
         {
             get
@@ -203,6 +209,10 @@ namespace HexagonMatch
                 return Hex.IsNeighbor(a.Hex, b.Hex);
             else
                 return false;
+        }
+        public static Hexagon Copy(Hexagon h)
+        {
+            return h != null ? new Hexagon(h.Hex, h.Content) : null;
         }
 
         public Vector2 Position
@@ -280,11 +290,13 @@ namespace HexagonMatch
             currentColor = Color.White;
             this.Content = type;
         }
-        public Hexagon(Point hex, HexagonContent type)
+        public Hexagon(Point hex, HexagonContent content)
         {
             this.hex = new Hex(hex.X, hex.Y, (-1) * hex.X - hex.Y);
             currentColor = Color.White;
-            Content = type;
+            Content = content;
         }
+
+        
     }
 }

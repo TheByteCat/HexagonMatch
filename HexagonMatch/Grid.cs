@@ -11,16 +11,17 @@ namespace HexagonMatch
     class Grid
     {
         List<Hexagon> selectedHex;
-        Hexagon[,] hexMap;
+        Hexagon[,] hexMap, bufferMap;
         short hexagonSize = 50;
         int mapRadius;
         byte maxValue;
         Hexagon lastHexagon, prevHexagon;
         Vector2 normalScale;
         Random rand;
+        GridAnimator animator;
         static float Sqrt3 = (float)Math.Sqrt(3);
         Texture2D hexagonTexture;
-        public static Color[] colors = { Color.LightSkyBlue, Color.SeaGreen, Color.White, Color.MediumTurquoise, Color.Aqua, Color.LightGreen };
+        //public static Color[] colors = { Color.LightSkyBlue, Color.SeaGreen, Color.White, Color.MediumTurquoise, Color.Aqua, Color.LightGreen };
         public static Texture2D Elements;
 
         public delegate void normalizeStartDelegat(Grid grid);
@@ -89,6 +90,18 @@ namespace HexagonMatch
                 return selectedHex;
             }
         }
+        internal Hexagon[,] BufferMap
+        {
+            get
+            {
+                return bufferMap;
+            }
+
+            set
+            {
+                bufferMap = value;
+            }
+        }
 
         public static Rectangle ElementSource(int index)
         {
@@ -101,14 +114,20 @@ namespace HexagonMatch
             return new Rectangle(size * (int)index, 0, size, size);
         }
 
-        private Hex PixelToHex(Vector2 position)
+        public Hex PixelToHex(Vector2 position)
         {
             Vector2 fixPosition = new Vector2((position.X - Center.X), (position.Y - Center.Y));
             float q = fixPosition.X * 2 / 3 / hexagonSize;
             float r = (-fixPosition.X / 3 + Sqrt3 / 3 * fixPosition.Y) / hexagonSize;
             return Hexagon.HexRound(q, r, -q - r);
         }
-        private Hexagon HexToHexagon(Hex hex)
+        public Vector2 HexToPixel(Hex hex)
+        {
+            float x = HexagonSize * 3.0f / 2.0f * hex.q - HexagonSize;
+            float y = HexagonSize * Sqrt3 * (hex.r + hex.q / 2.0f) - Sqrt3 / 2.0f * HexagonSize;
+            return new Vector2(x, y) + Center;
+        }
+        public Hexagon HexToHexagon(Hex hex)
         {
             if (Math.Abs(hex.q) > mapRadius || Math.Abs(hex.r) > mapRadius)
                 return null;
@@ -148,7 +167,7 @@ namespace HexagonMatch
         public void SetHexInfo(Hex hex, HexagonContent info)
         {
             if (Math.Abs(hex.q) <= mapRadius && Math.Abs(hex.r) <= mapRadius)
-            {                
+            {
                 hexMap[hex.q + mapRadius, hex.r + mapRadius].Content = info;
             }
         }
@@ -171,58 +190,47 @@ namespace HexagonMatch
             if (h != null)
                 hexMap[h.Q + mapRadius, h.R + mapRadius] = null;
         }
+        public void CopyMapToBuffer()
+        {
+            int len = mapRadius * 2 + 1;
+            for (int i = 0; i < len; i++)
+            {
+                for (int j = 0; j < len; j++)
+                {
+                    bufferMap[i, j] = Hexagon.Copy(hexMap[i, j]);
+                }
+            }
+        }
+        public void SwapMaps()
+        {
+            Hexagon[,] temp = hexMap;
+            hexMap = bufferMap;
+            bufferMap = temp;
+        }
 
         public Grid(short hexagonSize, Vector2 center, byte maxValue, Vector2 scale, int mapRadius = 3)
         {
             this.hexagonSize = hexagonSize;
             Center = center;
             hexMap = new Hexagon[mapRadius * 2 + 1, mapRadius * 2 + 1];
+            bufferMap = new Hexagon[mapRadius * 2 + 1, mapRadius * 2 + 1];
             selectedHex = new List<Hexagon>((mapRadius * 2 + 1) * (mapRadius * 2 + 1));
             this.maxValue = maxValue;
             this.mapRadius = mapRadius;
             normalScale = scale;
             rand = new Random();
+            animator = new GridAnimator(this, 500f);
         }
-
-        //private void NormalizeCell(Hex h)
-        //{
-        //    if (GetHexagonByHex(h).Content.Type == HexagonType.Empty)
-        //    {
-        //        Hex nextHex = h, currHex = h;
-        //        while (currHex.r > -mapRadius && currHex.s < mapRadius)
-        //        {
-        //            nextHex = Hex.Neighbor(currHex, 2);
-        //            Hexagon next = GetHexagonByHex(nextHex);
-        //            if (next != null)
-        //            {
-        //                if (next.Content.Type == HexagonType.Empty)
-        //                {
-        //                    NormalizeCell(nextHex);
-        //                }
-        //                if(next.Type == HexagonType.Block)
-        //                {
-        //                    Hex rightHex = Hex.Neighbor(currHex, 1);
-        //                    Hex leftHex = Hex.Neighbor(currHex, 3);
-        //                    NormalizeCell(rightHex);
-        //                    NormalizeCell(leftHex);
-        //                    //TODO fix
-        //                }
-        //                SetHexInfo(currHex, next.Content);
-        //                currHex = nextHex;
-        //            }
-        //        }
-        //        SetHexInfo(currHex, new HexagonContent(HexagonType.Element, (HexagonElement)rand.Next(maxValue)));
-        //    }
-        //}             
 
         public void FieldCell(Hex hex)
         {
             Hexagon h = GetHex(hex);
-            if(h.Type == HexagonType.Empty)
+            if (h.Type == HexagonType.Empty)
             {
-                if(h.S == mapRadius || h.R == -mapRadius)
+                if (h.S == mapRadius || h.R == -mapRadius)
                 {
-                    SetHexInfo(hex, new HexagonContent(HexagonType.Element, (HexagonElement)rand.Next(maxValue)));
+                    SetHexInfo(hex, new HexagonContent((HexagonElement)rand.Next(maxValue)));
+                    animator.AddAnimation(new AnimationInfo(Hex.Neighbor(hex, 2), hex, h.Content.Element));
                 }
                 else
                 {
@@ -233,6 +241,9 @@ namespace HexagonMatch
                         if (tempHex != null && tempHex.Type != HexagonType.Block)
                         {
                             hexContent = tempHex.Content;
+                            //
+                            animator.AddAnimation(new AnimationInfo(tempHex.Hex, hex, hexContent.Element));
+                            //
                             tempHex.Content = HexagonContent.Empty;
                             FieldCell(tempHex.Hex);
                             break;
@@ -248,24 +259,27 @@ namespace HexagonMatch
         /// </summary>
         public void Normalize()
         {
-            //foreach (Hexagon h in selectedHex)
-            //{
-            //    NormalizeCell(h.Hex);
-            //}
-            for (int layer = mapRadius; layer >= -mapRadius ; layer--)
+            animator.StartNormalize();
+            SwapMaps();
+            for (int layer = mapRadius; layer >= -mapRadius; layer--)
             {
                 Hex upperHex = new Hex(0, (-1) * layer, layer);
                 FieldCell(upperHex);//Field upper cell in leyer
+                animator.NextTurn();
                 Hex leftHex = Hex.Neighbor(upperHex, 4);
                 Hex rightHex = Hex.Neighbor(upperHex, 0);
                 for (int i = 0; i < mapRadius + Math.Min(0, layer); i++)
                 {
                     FieldCell(leftHex);
+                    animator.NextTurn();
                     FieldCell(rightHex);
+                    animator.NextTurn();
                     leftHex = Hex.Neighbor(leftHex, 4);
                     rightHex = Hex.Neighbor(rightHex, 0);
                 }
             }
+            SwapMaps();
+            animator.AnimationStart();
         }
 
         private bool IsValidNextHexagon(Hexagon h)
@@ -277,7 +291,7 @@ namespace HexagonMatch
                 !selectedHex.Contains(h);
         }
 
-        public void Update(GameTime gameTime, TouchCollection touch)
+        private void InputHandling(TouchCollection touch)
         {
             if (touch.Count != 0)
             {
@@ -331,6 +345,14 @@ namespace HexagonMatch
             }
         }
 
+        public void Update(GameTime gameTime, TouchCollection touch)
+        {
+            if (animator.IsEnable)
+                animator.Update(gameTime);
+            else
+                InputHandling(touch);
+        }
+
         public void Draw(SpriteBatch spriteBatch, SpriteFont font)
         {
             spriteBatch.Begin();
@@ -344,14 +366,13 @@ namespace HexagonMatch
                         spriteBatch.Draw(Elements,
                             position: h.Center - new Vector2(Elements.Height / 2.0f) * h.Scale,
                             sourceRectangle: ElementSource(h.Content.Element),
-                            scale: h.Scale,// * new Vector2(hexagonTexture.Height / Elements.Height) , 
+                            scale: h.Scale, 
                             color: Color.White);
                     }
-                    //var size = font.MeasureString(h.Value.ToString()) * normalScale.X / 2;
-                    //spriteBatch.DrawString(font, h.Value.ToString(), h.Center - size, Color.Black, 0, Vector2.Zero, normalScale.X, SpriteEffects.None, 0);
                 }
-            }
+            }            
             spriteBatch.End();
+            animator.Draw(spriteBatch);
         }
 
     }

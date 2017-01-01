@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/restart_ico.png</SourceFile>
+  <SourceFile>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/restart_ico.png</SourceFile>
   <SourceTime>2016-11-03T17:59:18.9001481+10:00</SourceTime>
-  <DestFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/restart_ico.xnb</DestFile>
-  <DestTime>2016-11-16T23:42:27.3657334+10:00</DestTime>
+  <DestFile>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/restart_ico.xnb</DestFile>
+  <DestTime>2017-01-02T00:04:46.7523681+10:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T16:36:08+10:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
