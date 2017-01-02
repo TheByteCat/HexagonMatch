@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/background_fhd.jpg</SourceFile>
+  <SourceFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/background_fhd.jpg</SourceFile>
   <SourceTime>2016-11-16T23:11:01.7859024+10:00</SourceTime>
-  <DestFile>C:/Users/Igor/Documents/Visual Studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/background_fhd.xnb</DestFile>
-  <DestTime>2017-01-02T00:04:47.1343409+10:00</DestTime>
+  <DestFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/background_fhd.xnb</DestFile>
+  <DestTime>2017-01-02T23:02:28.2359408+10:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T16:36:08+10:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

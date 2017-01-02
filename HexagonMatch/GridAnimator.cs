@@ -168,23 +168,45 @@ namespace HexagonMatch
                     }
                 }
                 else
-                {
+                {                    
                     if (info.Count != 0)
                     {
-                        int t = info.First.Value.Turn;
-                        while (info.Count != 0 && info.First.Value.Turn == t)
+                        var curr = info.First;
+                        int t = curr.Value.Turn;
+                        bool[] freeColl = new bool[2 * grid.MapRadius + 1];
+                        freeColl[curr.Value.Start.q + grid.MapRadius] = true;
+                        do
                         {
-                            if (grid.GetHexagonByHex(info.First.Value.Start) != null)
-                                grid.GetHexagonByHex(info.First.Value.Start).Content = HexagonContent.Empty;
-                            Vector2 delta = new Vector2(grid.HexagonTexture.Width / 2.0f * grid.NormalScale.X, grid.HexagonTexture.Height / 2.0f * grid.NormalScale.Y);
-                            tasks.AddFirst(new FallAnimation(
-                                grid.HexToPixel(info.First.Value.Start) + delta,
-                                grid.HexToPixel(info.First.Value.End) + delta,
-                                info.First.Value.Element,
-                                info.First.Value.End
-                                ));
-                            info.RemoveFirst();
-                        }
+                            if (curr.Value.Turn == t || !freeColl[curr.Value.Start.q + grid.MapRadius])
+                            {
+                                freeColl[curr.Value.Start.q + grid.MapRadius] = true;
+                                if (grid.GetHexagonByHex(curr.Value.Start) != null)
+                                    grid.GetHexagonByHex(curr.Value.Start).Content = HexagonContent.Empty;
+                                Vector2 delta = new Vector2(grid.HexagonTexture.Width / 2.0f * grid.NormalScale.X, grid.HexagonTexture.Height / 2.0f * grid.NormalScale.Y);
+                                tasks.AddFirst(new FallAnimation(
+                                    grid.HexToPixel(curr.Value.Start) + delta,
+                                    grid.HexToPixel(curr.Value.End) + delta,
+                                    curr.Value.Element,
+                                    curr.Value.End
+                                    ));
+                                var next = curr.Next;
+                                info.Remove(curr);
+                                if (next != null)
+                                {
+                                    curr = next;
+                                    if (curr.Value.Turn != t && !freeColl[curr.Value.Start.q + grid.MapRadius])
+                                    {
+                                        t = curr.Value.Turn;                                        
+                                    }
+                                }
+                                else
+                                    break;
+                            }
+                            else
+                            {
+                                curr = curr.Next;
+                            }
+                        } while (curr != null);
                     }
                     else
                         isEnable = false;

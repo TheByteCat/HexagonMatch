@@ -102,6 +102,18 @@ namespace HexagonMatch
                 bufferMap = value;
             }
         }
+        public int MapRadius
+        {
+            get
+            {
+                return mapRadius;
+            }
+
+            set
+            {
+                mapRadius = value;
+            }
+        }
 
         public static Rectangle ElementSource(int index)
         {
