@@ -40,6 +40,12 @@ namespace HexagonMatch
             return Hex.directions[direction];
         }
 
+        static public int Direction(Hex a, Hex b)
+        {
+            Hex h = Subtract(b, a);
+            return directions.IndexOf(h);
+        }
+
         static public Hex Neighbor(Hex hex, int direction)
         {
             return Hex.Add(hex, Hex.Direction(direction));
@@ -98,6 +104,7 @@ namespace HexagonMatch
     {
         HexagonType type;
         HexagonElement element;
+        bool frozen;
 
         internal HexagonType Type
         {
@@ -131,16 +138,18 @@ namespace HexagonMatch
             }
         }
 
-        public HexagonContent(HexagonType type = HexagonType.Empty, HexagonElement element = HexagonElement.None)
+        public HexagonContent(HexagonType type = HexagonType.Empty, HexagonElement element = HexagonElement.None, bool frozen = false)
         {
             this.type = type;
             this.element = element;
+            this.frozen = frozen;
         }
 
         public HexagonContent(HexagonElement element)
         {
             type = HexagonType.Element;
             this.element = element;
+            frozen = false;
         }
 
         public static HexagonContent Empty
@@ -158,12 +167,25 @@ namespace HexagonMatch
             }
         }
 
+        public bool Frozen
+        {
+            get
+            {
+                return frozen;
+            }
+
+            set
+            {
+                frozen = value;
+            }
+        }
     }
 
     class Hexagon
     {
         Hex hex;
         Color currentColor;
+        bool[] walls = new bool[6];
         public HexagonContent Content;
 
         static float sqrt3 = (float)Math.Sqrt(3);
@@ -228,12 +250,14 @@ namespace HexagonMatch
         {
             get
             {
-                return Position + new Vector2(Texture.Width / 2.0f * ownerGrid.NormalScale.X, Texture.Height / 2.0f * ownerGrid.NormalScale.Y);
+                //return Position + new Vector2(Texture.Width / 2.0f * ownerGrid.NormalScale.X, Texture.Height / 2.0f * ownerGrid.NormalScale.Y);
+                return Position + new Vector2(Texture.Width / 2.0f * ownerGrid.NormalScale.X);
             }
         }
         public Vector2 Scale
         {
-            get { return new Vector2((2.0f * ownerGrid.HexagonSize) / Texture.Width, (sqrt3 * ownerGrid.HexagonSize) / Texture.Height); }
+            //get { return new Vector2((2.0f * ownerGrid.HexagonSize) / Texture.Width, (sqrt3 * ownerGrid.HexagonSize) / Texture.Height); }
+            get { return new Vector2((2.0f * ownerGrid.HexagonSize) / Texture.Width); }
         }
         public int Q { get { return hex.q; } }
         public int R { get { return hex.r; } }
@@ -274,6 +298,8 @@ namespace HexagonMatch
             {
                 if (Type == HexagonType.Block)
                     return Color.DarkGray;
+                else if (Content.Frozen == true)
+                    return Color.Blue;
                 else
                     return currentColor;
             }
@@ -283,6 +309,65 @@ namespace HexagonMatch
                 currentColor = value;
             }
         }
+        public bool HaveWall(int dir)
+        {
+            return walls[dir];
+        }
+        public bool HaveWall(Hex a, Hex b)
+        {
+            return walls[Hex.Direction(a, b)];
+        }
+        public void addWall(int dir)
+        {
+            if (walls[dir] == false)
+            {
+                walls[dir] = true;
+                Hexagon h = ownerGrid.GetHexagonByHex(Hex.Neighbor(hex, dir));
+                if (h != null && !h.HaveWall(h.hex, hex))
+                {
+                    h.addWall(h.hex, hex);
+                }
+            }
+        }
+        public void addWall(Hex a, Hex b)
+        {
+            int dir = Hex.Direction(a, b);
+            if (walls[dir] == false)
+            {
+                walls[dir] = true;
+                Hexagon h = ownerGrid.GetHexagonByHex(Hex.Neighbor(hex, dir));
+                if (h != null && !h.HaveWall(h.hex, hex))
+                {
+                    h.addWall(h.hex, hex);
+                }
+            }
+        }
+        public void delWall(int dir)
+        {
+            if (walls[dir] == true)
+            {
+                walls[dir] = false;
+                Hexagon h = ownerGrid.GetHexagonByHex(Hex.Neighbor(hex, dir));
+                if (h != null && h.HaveWall(h.hex, hex))
+                {
+                    h.delWall(h.hex, hex);
+                }
+            }
+        }
+        public void delWall(Hex a, Hex b)
+        {
+            int dir = Hex.Direction(a, b);
+            if (walls[dir] == true)
+            {
+                walls[dir] = false;
+                Hexagon h = ownerGrid.GetHexagonByHex(Hex.Neighbor(hex, dir));
+                if (h != null && h.HaveWall(h.hex, hex))
+                {
+                    h.delWall(h.hex, hex);
+                }
+            }
+        }
+
 
         public Hexagon(Hex hex, HexagonContent type)
         {

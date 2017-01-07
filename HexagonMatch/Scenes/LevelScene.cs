@@ -38,7 +38,8 @@ namespace HexagonMatch.Scenes
         private void LoadContentForLevel()
         {
             Grid.Elements = game.Content.Load<Texture2D>("stones");
-            grid.HexagonTexture = game.Content.Load<Texture2D>("white_hexagon");            
+            grid.HexagonTexture = game.Content.Load<Texture2D>("png_hexagon");
+            grid.WallTexture = game.Content.Load<Texture2D>("wall");       
             scoreFont = game.Content.Load<SpriteFont>("score_font");
             fonTexture = game.Content.Load<Texture2D>("background_fhd");
             Texture2D forestTx = game.Content.Load<Texture2D>("forest4_background");
@@ -111,9 +112,8 @@ namespace HexagonMatch.Scenes
             }
             //
             grid.GetHex(new Hex(-2, 1, 1)).Content = HexagonContent.Block;
-            grid.GetHex(new Hex(2, -1, -1)).Content = HexagonContent.Block;
-            //grid.GetHex(new Hex(-1, 0, 1)).Content = HexagonContent.Block;
-            //grid.GetHex(new Hex(0, 0, 0)).Content = HexagonContent.Block;
+            grid.GetHex(new Hex(2, -1, -1)).Content.Frozen = true;
+            grid.GetHex(new Hex(0, 0, 0)).addWall(1);
             //
 
             grid.CopyMapToBuffer();

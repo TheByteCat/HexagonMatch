@@ -20,7 +20,7 @@ namespace HexagonMatch
         Random rand;
         GridAnimator animator;
         static float Sqrt3 = (float)Math.Sqrt(3);
-        Texture2D hexagonTexture;
+        Texture2D hexagonTexture, wallTexture;
         //public static Color[] colors = { Color.LightSkyBlue, Color.SeaGreen, Color.White, Color.MediumTurquoise, Color.Aqua, Color.LightGreen };
         public static Texture2D Elements;
 
@@ -83,6 +83,18 @@ namespace HexagonMatch
                 NormalScale = new Vector2((2.0f * HexagonSize) / hexagonTexture.Width, (Sqrt3 * HexagonSize) / hexagonTexture.Height);
             }
         }
+        public Texture2D WallTexture
+        {
+            get
+            {
+                return wallTexture;
+            }
+
+            set
+            {
+                wallTexture = value;
+            }
+        }
         internal List<Hexagon> SelectedHex
         {
             get
@@ -113,7 +125,7 @@ namespace HexagonMatch
             {
                 mapRadius = value;
             }
-        }
+        }        
 
         public static Rectangle ElementSource(int index)
         {
@@ -242,7 +254,7 @@ namespace HexagonMatch
                 if (h.S == mapRadius || h.R == -mapRadius)
                 {
                     SetHexInfo(hex, new HexagonContent((HexagonElement)rand.Next(maxValue)));
-                    animator.AddAnimation(new AnimationInfo(Hex.Neighbor(hex, 2), hex, h.Content.Element));
+                    animator.AddAnimation(new AnimationInfo(Hex.Neighbor(hex, 2), hex, h.Content));
                 }
                 else
                 {
@@ -250,11 +262,11 @@ namespace HexagonMatch
                     for (int i = 0; i < 3; i++)
                     {
                         Hexagon tempHex = GetHex(Hex.Neighbor(hex, ((i + 1) % 3) + 1));//get hex in order : up -> left-up -> right-up
-                        if (tempHex != null && tempHex.Type != HexagonType.Block)
+                        if (tempHex != null && tempHex.Type != HexagonType.Block && !tempHex.Content.Frozen && !h.HaveWall(((i + 1) % 3) + 1))
                         {
                             hexContent = tempHex.Content;
                             //
-                            animator.AddAnimation(new AnimationInfo(tempHex.Hex, hex, hexContent.Element));
+                            animator.AddAnimation(new AnimationInfo(tempHex.Hex, hex, hexContent));
                             //
                             tempHex.Content = HexagonContent.Empty;
                             FieldCell(tempHex.Hex);
@@ -294,13 +306,27 @@ namespace HexagonMatch
             animator.AnimationStart();
         }
 
-        private bool IsValidNextHexagon(Hexagon h)
+        private void Defreeze()
         {
+            foreach(Hexagon h in selectedHex)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    Hexagon temp = GetHexagonByHex(Hex.Neighbor(h.Hex, i));
+                    if(temp != null)
+                        temp.Content.Frozen = false;
+                }
+            }
+        }
+
+        private bool IsValidNextHexagon(Hexagon h)
+        {            
             return (h != lastHexagon) &&
                 Hexagon.IsNeighbor(lastHexagon, h) &&
                 h.Content.Type == HexagonType.Element &&
                 h.Content.Element == lastHexagon.Content.Element &&
-                !selectedHex.Contains(h);
+                !selectedHex.Contains(h) &&
+                !h.Content.Frozen;
         }
 
         private void InputHandling(TouchCollection touch)
@@ -324,7 +350,7 @@ namespace HexagonMatch
                         lastHexagon = prevHexagon;
                         prevHexagon = selectedHex.Count > 1 ? selectedHex[selectedHex.Count - 2] : null;
                     }
-                    else if (IsValidNextHexagon(h))
+                    else if (IsValidNextHexagon(h) && !lastHexagon.HaveWall(lastHexagon.Hex, h.Hex))
                     {
                         h.CurrentColor = Color.Maroon;
                         selectedHex.Add(h);
@@ -343,6 +369,7 @@ namespace HexagonMatch
                         h.CurrentColor = Color.White;
                     }
                     NormalizeStart?.Invoke(this);
+                    Defreeze();
                     Normalize();
                     NormalizeEnd?.Invoke(this);
                 }
@@ -373,6 +400,13 @@ namespace HexagonMatch
                 if (h != null)
                 {
                     spriteBatch.Draw(hexagonTexture, position: h.Position, scale: h.Scale, color: h.CurrentColor);
+                    for (int i = 0; i < 6; i++)
+                    {
+                        if(h.HaveWall(i))
+                        {
+                            spriteBatch.Draw(wallTexture, position: h.Center, rotation: -i * (float)Math.PI / 3.0f, scale: h.Scale, color: Color.White);
+                        }
+                    }
                     if (h.Content.Type == HexagonType.Element)
                     {
                         spriteBatch.Draw(Elements,

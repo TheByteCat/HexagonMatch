@@ -10,14 +10,14 @@ namespace HexagonMatch
     class FallAnimation
     {
         Vector2 startPosition, endPosition, currentPosition, direction;
-        HexagonElement element;
+        HexagonContent content;
         Hex end;
 
-        public FallAnimation(Vector2 startPosition, Vector2 endPosition, HexagonElement element, Hex endHex)
+        public FallAnimation(Vector2 startPosition, Vector2 endPosition, HexagonContent content, Hex endHex)
         {
             this.startPosition = startPosition;
             this.endPosition = endPosition;
-            this.element = element;
+            this.content = content;
             end = endHex;
             currentPosition = startPosition;
             direction = endPosition - startPosition;
@@ -50,18 +50,23 @@ namespace HexagonMatch
                 return currentPosition;
             }
         }
-        internal HexagonElement Element
-        {
-            get
-            {
-                return element;
-            }
-        }
         internal Hex End
         {
             get
             {
                 return end;
+            }
+        }
+        internal HexagonContent Content
+        {
+            get
+            {
+                return content;
+            }
+
+            set
+            {
+                content = value;
             }
         }
 
@@ -78,14 +83,14 @@ namespace HexagonMatch
     struct AnimationInfo
     {
         public Hex Start, End;
-        public HexagonElement Element;
+        public HexagonContent Content;
         public int Turn;
 
-        public AnimationInfo(Hex start, Hex end, HexagonElement element)
+        public AnimationInfo(Hex start, Hex end, HexagonContent content)
         {
             Start = start;
             End = end;
-            Element = element;
+            Content = content;
             Turn = 0;
         }
     }
@@ -157,7 +162,7 @@ namespace HexagonMatch
                         a.Update(gameTime, speed);
                         if (a.AnimationDone)
                         {
-                            grid.GetHexagonByHex(a.End).Content = new HexagonContent(a.Element);
+                            grid.GetHexagonByHex(a.End).Content = a.Content;
                             var next = curr.Next;
                             tasks.Remove(curr);
                             if (next == null)
@@ -186,7 +191,7 @@ namespace HexagonMatch
                                 tasks.AddFirst(new FallAnimation(
                                     grid.HexToPixel(curr.Value.Start) + delta,
                                     grid.HexToPixel(curr.Value.End) + delta,
-                                    curr.Value.Element,
+                                    curr.Value.Content,
                                     curr.Value.End
                                     ));
                                 var next = curr.Next;
@@ -222,7 +227,7 @@ namespace HexagonMatch
                 Vector2 scale = new Vector2((2.0f * grid.HexagonSize) / grid.HexagonTexture.Width, (sqrt3 * grid.HexagonSize) / grid.HexagonTexture.Height);
                 spriteBatch.Draw(Grid.Elements,
                             position: a.CurrentPosition - new Vector2(Grid.Elements.Height / 2.0f) * scale,
-                            sourceRectangle: Grid.ElementSource(a.Element),
+                            sourceRectangle: Grid.ElementSource(a.Content.Element),
                             scale: scale,
                             color: Color.White);
             }
