@@ -11,35 +11,41 @@ namespace HexagonMatch.GUI
 {
     class GUIManager : DrawableGameComponent
     {
-        List<Widget> widgets;
+        Layout mainLayout;
         SpriteBatch spriteBatch;
         Vector2 scale;
 
-        public GUIManager(Game game, SpriteBatch spriteBatch, Vector2 scale ,int capacity = 10) : base(game)
+        internal Layout MainLayout
         {
-            widgets = new List<Widget>(capacity);
-            this.spriteBatch = spriteBatch;
-            this.scale = scale;
+            get
+            {
+                return mainLayout;
+            }
+
+            set
+            {
+                mainLayout = value;
+            }
         }
 
-        public void AddWidget(Widget widget)
+        public GUIManager(MainGame game, SpriteBatch spriteBatch, Vector2 scale) : base(game)
         {
-            widgets.Add(widget);
+            this.spriteBatch = spriteBatch;
+            this.scale = scale;
+            mainLayout = new Layout(new Rectangle(Point.Zero, game.CurrentScreenSize));
         }
 
         public override void Update(GameTime gameTime)
         {
-            TouchCollection state = TouchPanel.GetState();   
-            foreach (Widget w in widgets)
-                w.Update(gameTime, state);
+            TouchCollection state = TouchPanel.GetState();
+            mainLayout.Update(gameTime, state);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
             spriteBatch.Begin();
-            foreach (Widget w in widgets)
-                w.Draw(spriteBatch, scale);
+            mainLayout.Draw(spriteBatch, scale);
             spriteBatch.End();
             base.Draw(gameTime);
         }

@@ -13,14 +13,15 @@ namespace HexagonMatch.GUI
     {
         protected Rectangle touchArea;
         protected Vector2 position;
+        private Layout parent;
 
-        public Widget(Rectangle touchArea, Vector2 position)
+        public Widget(Rectangle touchArea, Vector2 position, Widget parent = null)
         {
             this.touchArea = touchArea;
             this.position = position;
         }
 
-        public virtual void Update(GameTime gameTime, TouchCollection mouseState) { }
+        public virtual void Update(GameTime gameTime, TouchCollection touchs) { }
         public virtual void Draw(SpriteBatch spriteBatch, Vector2 scale) { }
 
         public Rectangle TouchArea
@@ -33,6 +34,18 @@ namespace HexagonMatch.GUI
             set
             {
                 touchArea = value;
+            }
+        }
+        public Layout Parent
+        {
+            get
+            {
+                return parent;
+            }
+
+            set
+            {
+                parent = value;
             }
         }
     }

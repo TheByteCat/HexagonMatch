@@ -8,6 +8,9 @@ namespace HexagonMatch.Scenes
         protected SpriteBatch spriteBatch;
         protected MainGame game;
 
+        public Screen Screen { get; set; }
+        public InputState Input { get; set; }
+
         public Scene(MainGame game, SpriteBatch spriteBatch)
         {
             this.spriteBatch = spriteBatch;

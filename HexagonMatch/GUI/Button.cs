@@ -67,7 +67,7 @@ namespace HexagonMatch.GUI
         {
             if (enable)
             {
-                spriteBatch.Draw(texture, position, color : Color.White, scale : scale);
+                spriteBatch.Draw(texture, position + Parent.Area.Location.ToVector2(), color : Color.White, scale : scale);
                 if (text != "")
                 {
                     Vector2 size = font.MeasureString(text);

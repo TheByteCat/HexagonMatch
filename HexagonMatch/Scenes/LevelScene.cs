@@ -23,6 +23,7 @@ namespace HexagonMatch.Scenes
         Rectangle gridArea, locationArea;
         Location location;
         Enemy enemy;
+        LevelManager levelManager;
         
         private void RestartGrid()
         {
@@ -50,13 +51,14 @@ namespace HexagonMatch.Scenes
             enemy = new Enemy("Goblin", goblinTx, 30);
             //
             //GUI Initialization
-            Button restartBtn = new Button(new Vector2(5, 10), backBtnTexture);
+            Button restartBtn = new Button(new Vector2(game.CurrentScreenSize.X - backBtnTexture.Height, 10), backBtnTexture);
             restartBtn.Click += () =>
             {
-                RestartGrid();   
+                RestartGrid();
             };
+            //LevelManagerLayout lvlInfoLayout = new LevelManagerLayout()
             gui = new GUIManager(game, spriteBatch, game.Scale);
-            gui.AddWidget(restartBtn);
+            gui.MainLayout.AddWidget(restartBtn);
             //game.Components.Add(gui);
         }
 
@@ -88,13 +90,6 @@ namespace HexagonMatch.Scenes
                 game.CurrentScreenSize.X - (game.CurrentScreenSize.X / 10) * 2,
                 game.CurrentScreenSize.Y - ((game.CurrentScreenSize.Y / 100 * 40) + (game.CurrentScreenSize.Y / 10))
                 );
-            //locationArea = new Rectangle(
-            //    gridArea.X,
-            //    game.CurrentScreenSize.Y / 100 * 5,
-            //    gridArea.Width,
-            //    gridArea.Y - game.CurrentScreenSize.X / 10
-            //    );
-            //locationArea = new Rectangle(0, 0, game.CurrentScreenSize.X, game.CurrentScreenSize.X / 16 * 9);
             locationArea = new Rectangle(0, 0, game.CurrentScreenSize.X, game.CurrentScreenSize.Y);
             Vector2 center = new Vector2(gridArea.Width / 2.0f + gridArea.X, gridArea.Height / 2.0f + gridArea.Y);
             int mapRadius = 3;
@@ -118,6 +113,8 @@ namespace HexagonMatch.Scenes
 
             grid.CopyMapToBuffer();
             grid.NormalizeStart += Grid_NormalizeStart;
+
+            levelManager = new LevelManager(game, grid, new LevelInfo(10, new LevelConditionInfo(HexagonElement.Brown, 10)));
             base.Initialize();
         }
 

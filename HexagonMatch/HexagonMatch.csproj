@@ -62,6 +62,10 @@
     <Compile Include="Enemy.cs" />
     <Compile Include="FPSCounterComponent.cs" />
     <Compile Include="GridAnimator.cs" />
+    <Compile Include="GUI\Layout.cs" />
+    <Compile Include="InputState.cs" />
+    <Compile Include="LevelManager.cs" />
+    <Compile Include="LevelManagerLayout.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="Grid.cs" />
@@ -76,6 +80,7 @@
     <Compile Include="Scenes\MenuScene.cs" />
     <Compile Include="Scenes\Scene.cs" />
     <Compile Include="Scenes\SceneManager.cs" />
+    <Compile Include="Screen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
