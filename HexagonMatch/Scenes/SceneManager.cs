@@ -17,6 +17,19 @@ namespace HexagonMatch.Scenes
         Screen screen;
         InputState input = new InputState();
 
+        internal Scene CurrentScene
+        {
+            get
+            {
+                return currentScene;
+            }
+
+            set
+            {
+                currentScene = value;
+            }
+        }
+
         public delegate void sceneChangeDelegate(SceneTitle prevScene, SceneTitle newScene);
         public event sceneChangeDelegate SceneChanged;
 

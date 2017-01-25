@@ -63,18 +63,18 @@ namespace HexagonMatch.GUI
             base.Update(gameTime, state);
         }
 
-        public override void Draw(SpriteBatch spriteBatch, Vector2 scale)
+        public override void Draw(SpriteBatch spriteBatch)
         {
             if (enable)
             {
-                spriteBatch.Draw(texture, position + Parent.Area.Location.ToVector2(), color : Color.White, scale : scale);
+                spriteBatch.Draw(texture, position + Parent.Area.Location.ToVector2(), color : Color.White);
                 if (text != "")
                 {
                     Vector2 size = font.MeasureString(text);
-                    spriteBatch.DrawString(font, text, new Vector2((int)(touchArea.X + touchArea.Width / 2 - size.X / 2), (int)(touchArea.Y + touchArea.Height / 2 - size.Y / 2)) * scale, Color.White);
+                    spriteBatch.DrawString(font, text, new Vector2((int)(touchArea.X + touchArea.Width / 2 - size.X / 2), (int)(touchArea.Y + touchArea.Height / 2 - size.Y / 2)), Color.White);
                 }
             }
-            base.Draw(spriteBatch, scale);
+            base.Draw(spriteBatch);
         }
     }
 }

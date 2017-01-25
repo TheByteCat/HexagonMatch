@@ -22,7 +22,7 @@ namespace HexagonMatch.GUI
         }
 
         public virtual void Update(GameTime gameTime, TouchCollection touchs) { }
-        public virtual void Draw(SpriteBatch spriteBatch, Vector2 scale) { }
+        public virtual void Draw(SpriteBatch spriteBatch) { }
 
         public Rectangle TouchArea
         {

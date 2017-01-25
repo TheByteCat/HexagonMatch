@@ -119,7 +119,8 @@ namespace HexagonMatch
             bool complete = true;
             foreach (Hexagon h in grid.SelectedHex)
             {
-                el[(int)h.Content.Element]++;
+                if (h.Content.Element != HexagonElement.None)
+                    el[(int)h.Content.Element]++;
             }
             foreach (LevelCondition c in conditions)
             {

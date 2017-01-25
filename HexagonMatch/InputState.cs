@@ -34,7 +34,13 @@ namespace HexagonMatch
         
         public void Update()
         {
-            TouchState = TouchPanel.GetState();
+            var touchState = TouchPanel.GetState();
+            List<TouchLocation> l = new List<TouchLocation>(touchState.Count);
+            foreach (var t in touchState)
+            {
+                l.Add(new TouchLocation(t.Id, t.State, Vector2.Transform(t.Position - Screen.InputTranslate, Screen.InputScale)));
+            }
+            TouchState = new TouchCollection(l.ToArray());
 
             Gestures.Clear();
             while (TouchPanel.IsGestureAvailable)

@@ -12,10 +12,13 @@ namespace HexagonMatch
         Vector2 startPosition, endPosition, currentPosition, direction;
         HexagonContent content;
         Hex end;
+        GridAnimator parant;
+        
 
-        public FallAnimation(Vector2 startPosition, Vector2 endPosition, HexagonContent content, Hex endHex)
+        public FallAnimation(GridAnimator parant , Vector2 startPosition, Vector2 endPosition, HexagonContent content, Hex endHex)
         {
-            this.startPosition = startPosition;
+            this.parant = parant;
+            this.startPosition = startPosition;            
             this.endPosition = endPosition;
             this.content = content;
             end = endHex;
@@ -26,7 +29,7 @@ namespace HexagonMatch
 
         public bool AnimationDone
         {
-            get { return currentPosition.Y >= endPosition.Y; }
+            get { return currentPosition.Y + parant.Speed / 30  >= endPosition.Y; }
         }
 
         public Vector2 StartPosition
@@ -70,11 +73,11 @@ namespace HexagonMatch
             }
         }
 
-        public void Update(GameTime gameTime, float speed)
+        public void Update(GameTime gameTime)
         {
             if (!AnimationDone)
             {
-                currentPosition += direction * speed * (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                currentPosition += direction * parant.Speed * (float)(gameTime.ElapsedGameTime.TotalSeconds);
                 currentPosition = !AnimationDone ? currentPosition : endPosition;
             }
         }
@@ -101,7 +104,7 @@ namespace HexagonMatch
         LinkedList<AnimationInfo> info;//Store all animation
         Grid grid;
         int turn = 0;
-        float speed;
+        public float Speed { get; private set; }
         bool isEnable = false;
 
         public bool IsEnable
@@ -120,7 +123,7 @@ namespace HexagonMatch
         public GridAnimator(Grid g, float speed)
         {
             grid = g;
-            this.speed = speed;
+            Speed = speed;
             tasks = new LinkedList<FallAnimation>();
             info = new LinkedList<AnimationInfo>();
         }
@@ -159,7 +162,7 @@ namespace HexagonMatch
                     while (curr != null)
                     {
                         var a = curr.Value;
-                        a.Update(gameTime, speed);
+                        a.Update(gameTime);
                         if (a.AnimationDone)
                         {
                             grid.GetHexagonByHex(a.End).Content = a.Content;
@@ -189,6 +192,7 @@ namespace HexagonMatch
                                     grid.GetHexagonByHex(curr.Value.Start).Content = HexagonContent.Empty;
                                 Vector2 delta = new Vector2(grid.HexagonTexture.Width / 2.0f * grid.NormalScale.X, grid.HexagonTexture.Height / 2.0f * grid.NormalScale.Y);
                                 tasks.AddFirst(new FallAnimation(
+                                    this,
                                     grid.HexToPixel(curr.Value.Start) + delta,
                                     grid.HexToPixel(curr.Value.End) + delta,
                                     curr.Value.Content,
@@ -220,7 +224,6 @@ namespace HexagonMatch
         }
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Begin();
             float sqrt3 = (float)Math.Sqrt(3);
             foreach (FallAnimation a in tasks)
             {
@@ -231,7 +234,6 @@ namespace HexagonMatch
                             scale: scale,
                             color: Color.White);
             }
-            spriteBatch.End();
         }
 
     }

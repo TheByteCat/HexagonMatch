@@ -9,11 +9,11 @@ using Microsoft.Xna.Framework.Input.Touch;
 
 namespace HexagonMatch.GUI
 {
-    class GUIManager : DrawableGameComponent
+    class GUIManager
     {
         Layout mainLayout;
         SpriteBatch spriteBatch;
-        Vector2 scale;
+        //Vector2 scale;
 
         internal Layout MainLayout
         {
@@ -28,26 +28,20 @@ namespace HexagonMatch.GUI
             }
         }
 
-        public GUIManager(MainGame game, SpriteBatch spriteBatch, Vector2 scale) : base(game)
+        public GUIManager(MainGame game, SpriteBatch spriteBatch)
         {
             this.spriteBatch = spriteBatch;
-            this.scale = scale;
-            mainLayout = new Layout(new Rectangle(Point.Zero, game.CurrentScreenSize));
+            mainLayout = new Layout(new Rectangle(0, 0, MainGame.NormalWidth, MainGame.NormalHeight));
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, TouchCollection state)
         {
-            TouchCollection state = TouchPanel.GetState();
             mainLayout.Update(gameTime, state);
-            base.Update(gameTime);
         }
 
-        public override void Draw(GameTime gameTime)
+        public void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
-            mainLayout.Draw(spriteBatch, scale);
-            spriteBatch.End();
-            base.Draw(gameTime);
+            mainLayout.Draw(spriteBatch);
         }
     }
 }

@@ -17,32 +17,14 @@ namespace HexagonMatch
         SpriteBatch spriteBatch;        
         SpriteFont baseFont;        
         Point currentScreenSize;
-        const int NormalWidth = 1080, NormalHeight = 1920;
-        Vector2 scale;
-        SceneManager sceneManager;        
+        public const int NormalWidth = 1080, NormalHeight = 1920;
+        SceneManager sceneManager;
 
         public Point CurrentScreenSize
         {
             get
             {
-                return currentScreenSize;
-            }
-
-            set
-            {
-                currentScreenSize = value;
-            }
-        }
-        public Vector2 Scale
-        {
-            get
-            {
-                return scale;
-            }
-
-            set
-            {
-                scale = value;
+                return new Point(NormalWidth, NormalHeight);
             }
         }
         public SpriteFont BaseFont
@@ -52,6 +34,7 @@ namespace HexagonMatch
                 return baseFont;
             }
         }
+        public Scene CurrentScene { get { return sceneManager.CurrentScene; } }
 
         public MainGame()
         {
@@ -61,11 +44,10 @@ namespace HexagonMatch
             var metric = new Android.Util.DisplayMetrics();
             Activity.WindowManager.DefaultDisplay.GetMetrics(metric);
             graphics.IsFullScreen = true;
-            graphics.PreferredBackBufferWidth = metric.WidthPixels;
-            graphics.PreferredBackBufferHeight = metric.HeightPixels;
+            
             currentScreenSize = metric.WidthPixels < metric.HeightPixels ? new Point(metric.WidthPixels, metric.HeightPixels) : new Point(metric.HeightPixels, metric.WidthPixels);
-            scale =new Vector2((float)currentScreenSize.X / NormalWidth, (float)currentScreenSize.Y / NormalHeight);
-            //graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+            graphics.PreferredBackBufferWidth = currentScreenSize.X;
+            graphics.PreferredBackBufferHeight = currentScreenSize.Y;
             graphics.SupportedOrientations = DisplayOrientation.Portrait | DisplayOrientation.PortraitDown;
 
         }
@@ -94,7 +76,7 @@ namespace HexagonMatch
             // TODO: use this.Content to load your game content here
             baseFont = Content.Load<SpriteFont>("baseFont");
 
-            sceneManager = new SceneManager(this, spriteBatch, SceneTitle.Level);
+            sceneManager = new SceneManager(this, spriteBatch, new Point(NormalWidth, NormalHeight), SceneTitle.Level);
             FPSCounterComponent fps = new FPSCounterComponent(this, spriteBatch, baseFont);
             Components.Add(sceneManager);
             Components.Add(fps);                      

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace HexagonMatch.Scenes
 {
-    class Scene
+    public class Scene
     {
         protected SpriteBatch spriteBatch;
         protected MainGame game;

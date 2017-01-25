@@ -57,7 +57,7 @@ namespace HexagonMatch.Scenes
                 RestartGrid();
             };
             //LevelManagerLayout lvlInfoLayout = new LevelManagerLayout()
-            gui = new GUIManager(game, spriteBatch, game.Scale);
+            gui = new GUIManager(game, spriteBatch);
             gui.MainLayout.AddWidget(restartBtn);
             //game.Components.Add(gui);
         }
@@ -67,6 +67,7 @@ namespace HexagonMatch.Scenes
             rand = new Random();            
             Initialize();
             LoadContentForLevel();
+            TouchPanel.EnabledGestures = GestureType.FreeDrag | GestureType.Tap;
         }
 
         internal LevelType Type
@@ -94,7 +95,7 @@ namespace HexagonMatch.Scenes
             Vector2 center = new Vector2(gridArea.Width / 2.0f + gridArea.X, gridArea.Height / 2.0f + gridArea.Y);
             int mapRadius = 3;
             short hexSize = (short)((gridArea.Width / (2 * (mapRadius + 1) + mapRadius)));
-            grid = new Grid(hexSize, center, maxValue, game.Scale, mapRadius);
+            grid = new Grid(hexSize, center, maxValue, mapRadius);
             Hexagon.OwnerGrid = grid;
             for (int q = -mapRadius; q <= mapRadius; q++)
             {
@@ -129,26 +130,31 @@ namespace HexagonMatch.Scenes
             }
         }
 
+        private void FixTouch(TouchCollection touch)
+        {
+
+        }
+
         public override void Update(GameTime gameTime)
         {
-            TouchCollection touch = TouchPanel.GetState();
-            grid.Update(gameTime, touch);
-            gui.Update(gameTime);
+            //TouchCollection touch = TouchPanel.GetState();
+            grid.Update(gameTime, Input.TouchState);
+            gui.Update(gameTime, Input.TouchState);
             base.Update(gameTime);
         }
 
         private void DebugDraw(GameTime gameTime)
         {
-            Vector2 scorePosition = new Vector2(game.CurrentScreenSize.X - scoreFont.MeasureString(gameTime.ElapsedGameTime.TotalSeconds.ToString()).X * game.Scale.X - 10, 5);
+            Vector2 scorePosition = new Vector2(game.CurrentScreenSize.X - scoreFont.MeasureString(gameTime.ElapsedGameTime.TotalSeconds.ToString()).X - 10, 5);
             spriteBatch.Begin();
-            spriteBatch.DrawString(scoreFont, gameTime.ElapsedGameTime.TotalSeconds.ToString(), scorePosition, Color.White, 0, Vector2.Zero, game.Scale.X, SpriteEffects.None, 0);
+            spriteBatch.DrawString(scoreFont, gameTime.ElapsedGameTime.TotalSeconds.ToString(), scorePosition, Color.White);
             spriteBatch.End();
         }
 
         public override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
-            spriteBatch.Draw(fonTexture, Vector2.Zero, color: Color.White, scale: game.Scale);//Draw background 
+            spriteBatch.Begin(transformMatrix: Screen.Scale);
+            spriteBatch.Draw(fonTexture, Vector2.Zero, color: Color.White);//Draw background 
             //Draw score           
             //string scoreStr = "Score: " + score.ToString();
             //Vector2 scorePosition = new Vector2(game.CurrentScreenSize.X - scoreFont.MeasureString(scoreStr).X * game.Scale.X - 10, 5);
@@ -158,19 +164,21 @@ namespace HexagonMatch.Scenes
             spriteBatch.Draw(location.Texture, locationArea, Color.White);
             //Draw enemy
             //Vector2 enemyPos = locationArea.Center.ToVector2() - (new Vector2(enemy.Texture.Width / 2, enemy.Texture.Height / 2) * game.Scale);
-            Vector2 enemyPos = new Rectangle(0, 0, game.CurrentScreenSize.X, game.CurrentScreenSize.X / 16 * 9).Center.ToVector2() - (new Vector2(enemy.Texture.Width / 2, enemy.Texture.Height / 2) * game.Scale);
-            spriteBatch.Draw(enemy.Texture, position: enemyPos, scale: game.Scale, color: Color.White);
+            Vector2 enemyPos = new Rectangle(0, 0, game.CurrentScreenSize.X, game.CurrentScreenSize.X / 16 * 9).Center.ToVector2() - (new Vector2(enemy.Texture.Width / 2, enemy.Texture.Height / 2));
+            spriteBatch.Draw(enemy.Texture, position: enemyPos, color: Color.White);
             //Draw enemy hp
             string enemyHpStr = enemy.Hp.ToString() + " / " + enemy.MaxHp;
-            Vector2 size = game.BaseFont.MeasureString(enemyHpStr) * game.Scale;
+            Vector2 size = game.BaseFont.MeasureString(enemyHpStr);
             //Vector2 enemyHpPos = new Vector2(locationArea.X + (locationArea.Width / 2 - size.X / 2), locationArea.Y + locationArea.Height - size.Y);
-            Vector2 enemyHpPos = new Vector2(enemyPos.X + (enemy.Texture.Width * game.Scale.X / 2 - size.X / 2), enemyPos.Y + enemy.Texture.Height * game.Scale.Y + size.Y);
-            spriteBatch.DrawString(game.BaseFont, enemyHpStr, enemyHpPos, Color.Maroon, 0, Vector2.Zero, game.Scale, SpriteEffects.None, 0);
-            spriteBatch.End();
+            Vector2 enemyHpPos = new Vector2(enemyPos.X + (enemy.Texture.Width / 2 - size.X / 2), enemyPos.Y + enemy.Texture.Height * + size.Y);
+            spriteBatch.DrawString(game.BaseFont, enemyHpStr, enemyHpPos, Color.Maroon);
+            
 
             grid.Draw(spriteBatch, game.BaseFont);//Draw hexagon grid
             //DebugDraw(gameTime);
             gui.Draw(gameTime);
+
+            spriteBatch.End();
             base.Draw(gameTime);
         }
 

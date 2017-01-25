@@ -120,18 +120,18 @@ namespace HexagonMatch.GUI
             }
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch, Vector2 scale)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             var curr = layouts.Last;
             while (curr != null)
             {
-                curr.Value.Draw(spriteBatch, scale);
+                curr.Value.Draw(spriteBatch);
                 curr = curr.Previous;
             }
             foreach (Widget w in widgets)
-                w.Draw(spriteBatch, scale);
+                w.Draw(spriteBatch);
             if (important != null)
-                important.Draw(spriteBatch, scale);
+                important.Draw(spriteBatch);
         }
 
     }

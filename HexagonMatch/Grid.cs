@@ -16,7 +16,7 @@ namespace HexagonMatch
         int mapRadius;
         byte maxValue;
         Hexagon lastHexagon, prevHexagon;
-        Vector2 normalScale;
+        //Vector2 normalScale;
         Random rand;
         GridAnimator animator;
         static float Sqrt3 = (float)Math.Sqrt(3);
@@ -38,26 +38,10 @@ namespace HexagonMatch
         {
             get
             {
-                return normalScale;
-            }
-
-            set
-            {
-                normalScale = value;
+                return new Vector2((2.0f * HexagonSize) / hexagonTexture.Width, (Sqrt3 * HexagonSize) / hexagonTexture.Height);
             }
         }
-        public short HexagonSize
-        {
-            get
-            {
-                return hexagonSize;
-            }
-
-            set
-            {
-                hexagonSize = value;
-            }
-        }
+        public short HexagonSize { get { return hexagonSize; }}
         internal Hexagon[,] HexMap
         {
             get
@@ -80,7 +64,6 @@ namespace HexagonMatch
             set
             {
                 hexagonTexture = value;
-                NormalScale = new Vector2((2.0f * HexagonSize) / hexagonTexture.Width, (Sqrt3 * HexagonSize) / hexagonTexture.Height);
             }
         }
         public Texture2D WallTexture
@@ -232,7 +215,7 @@ namespace HexagonMatch
             bufferMap = temp;
         }
 
-        public Grid(short hexagonSize, Vector2 center, byte maxValue, Vector2 scale, int mapRadius = 3)
+        public Grid(short hexagonSize, Vector2 center, byte maxValue, int mapRadius = 3)
         {
             this.hexagonSize = hexagonSize;
             Center = center;
@@ -241,9 +224,8 @@ namespace HexagonMatch
             selectedHex = new List<Hexagon>((mapRadius * 2 + 1) * (mapRadius * 2 + 1));
             this.maxValue = maxValue;
             this.mapRadius = mapRadius;
-            normalScale = scale;
             rand = new Random();
-            animator = new GridAnimator(this, 500f);
+            animator = new GridAnimator(this, 100f);
         }
 
         public void FieldCell(Hex hex)
@@ -394,7 +376,7 @@ namespace HexagonMatch
 
         public void Draw(SpriteBatch spriteBatch, SpriteFont font)
         {
-            spriteBatch.Begin();
+            //spriteBatch.Begin();
             foreach (Hexagon h in hexMap)
             {
                 if (h != null)
@@ -417,7 +399,7 @@ namespace HexagonMatch
                     }
                 }
             }            
-            spriteBatch.End();
+            //spriteBatch.End();
             animator.Draw(spriteBatch);
         }
 

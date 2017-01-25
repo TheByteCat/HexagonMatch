@@ -24,7 +24,6 @@ namespace HexagonMatch
     public class Screen : DrawableGameComponent
     {
         #region Fields
-        //InputState input = new InputState();
 
         SpriteBatch spriteBatch;
 
@@ -33,6 +32,7 @@ namespace HexagonMatch
         private bool updateMatrix = true;
         private Matrix scaleMatrix = Matrix.Identity;
         private GraphicsDeviceManager DeviceManager = null;
+        private Point realScreenSize;
 
         #endregion
 
@@ -99,11 +99,9 @@ namespace HexagonMatch
             this.virtualHeight = virtualHeight;
             this.virtualWidth = virtualWidth;
             this.DeviceManager = (GraphicsDeviceManager)game.Services.GetService(typeof(IGraphicsDeviceManager));
-
-            // we must set EnabledGestures before we can query for them, but
-            // we don't assume the game wants to read them.
-            TouchPanel.EnabledGestures = GestureType.None;            
-            //input.Screen = this;
+            realScreenSize = DeviceManager.PreferredBackBufferWidth < DeviceManager.PreferredBackBufferHeight ?
+                new Point(DeviceManager.PreferredBackBufferWidth, DeviceManager.PreferredBackBufferHeight) :
+                new Point(DeviceManager.PreferredBackBufferHeight, DeviceManager.PreferredBackBufferWidth);
         }
         /// <summary>
         /// Load your graphics content.
@@ -125,8 +123,8 @@ namespace HexagonMatch
         {
             Viewport vp = new Viewport();
             vp.X = vp.Y = 0;
-            vp.Width = DeviceManager.PreferredBackBufferWidth;
-            vp.Height = DeviceManager.PreferredBackBufferHeight;
+            vp.Width = realScreenSize.X;
+            vp.Height = realScreenSize.Y;
             GraphicsDevice.Viewport = vp;
         }
 
@@ -139,13 +137,13 @@ namespace HexagonMatch
         {
             float targetAspectRatio = GetVirtualAspectRatio();
             // figure out the largest area that fits in this resolution at the desired aspect ratio
-            int width = DeviceManager.PreferredBackBufferWidth;
+            int width = realScreenSize.X;
             int height = (int)(width / targetAspectRatio + .5f);
             bool changed = false;
 
-            if (height > DeviceManager.PreferredBackBufferHeight)
+            if (height > realScreenSize.Y)
             {
-                height = DeviceManager.PreferredBackBufferHeight;
+                height = realScreenSize.Y;
                 // PillarBox
                 width = (int)(height * targetAspectRatio + .5f);
                 changed = true;
@@ -154,8 +152,8 @@ namespace HexagonMatch
             // set up the new viewport centered in the backbuffer
             Viewport viewport = new Viewport();
 
-            viewport.X = (DeviceManager.PreferredBackBufferWidth / 2) - (width / 2);
-            viewport.Y = (DeviceManager.PreferredBackBufferHeight / 2) - (height / 2);
+            viewport.X = (realScreenSize.X / 2) - (width / 2);
+            viewport.Y = (realScreenSize.Y / 2) - (height / 2);
             viewport.Width = width;
             viewport.Height = height;
             viewport.MinDepth = 0;
