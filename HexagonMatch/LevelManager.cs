@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Microsoft.Xna.Framework;
 
@@ -97,7 +96,7 @@ namespace HexagonMatch
 
             set
             {
-                steps = value;
+                steps = Math.Max(0, value);
             }
         }
         internal List<LevelCondition> Conditions
@@ -130,6 +129,7 @@ namespace HexagonMatch
             }
             if (complete)
                 CompleteLevel();
+            Steps -= 1;
 
         }
 

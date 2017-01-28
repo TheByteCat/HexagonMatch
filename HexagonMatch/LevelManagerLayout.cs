@@ -24,8 +24,7 @@ namespace HexagonMatch
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            //new Rectangle((int)(Area.X * scale.X), (int)(Area.Y * scale.Y), (int)(Area.Width * scale.X), (int)(Area.Height * scale.Y));
-            spriteBatch.Draw(backgraund, new Rectangle((Area.Location.ToVector2()).ToPoint(), (Area.Size.ToVector2()).ToPoint()) , Color.White);
+            spriteBatch.Draw(backgraund, Area , Color.White);
             for (int i = 0; i < levelManager.Conditions.Count; i++)
             {
                 LevelCondition c = levelManager.Conditions[i];
@@ -36,9 +35,10 @@ namespace HexagonMatch
                     destinationRectangle: new Rectangle(new Point(10, (int)(size.Y + 5) * i) + Area.Location, new Point((int)size.Y)),
                     sourceRectangle: Grid.ElementSource(c.Info.Element), 
                     color: Color.White);
-                spriteBatch.DrawString(font, s, new Vector2(10 + size.X, (int)(size.Y + 5) * i) + Area.Location.ToVector2(),  Color.Black);
+                spriteBatch.DrawString(font, s, new Vector2(10 + size.Y, (int)(size.Y + 5) * i) + Area.Location.ToVector2(),  Color.Black);
             }
-            Vector2 stepsPos = new Vector2(backgraund.Width / 2 - font.MeasureString(levelManager.Steps.ToString()).X, (font.Texture.Height + 5) * levelManager.Conditions.Count);
+            Vector2 stepSize = font.MeasureString(levelManager.Steps.ToString());
+            Vector2 stepsPos = new Vector2(Area.Width / 2 - stepSize.X, Area.Height - stepSize.Y);
             spriteBatch.DrawString(font, levelManager.Steps.ToString(), Area.Location.ToVector2() + stepsPos, Color.Black);
             base.Draw(spriteBatch);
         }

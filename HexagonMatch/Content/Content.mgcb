@@ -145,7 +145,13 @@
 /processorParam:TextureFormat=Color
 /build:wall.png
 
-#begin levlInfo.jpg
+#begin lvlInfoFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:lvlInfoFont.spritefont
+
+#begin lvlInfo.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -155,11 +161,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:levlInfo.jpg
-
-#begin levlInfoFont.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:levlInfoFont.spritefont
+/build:lvlInfo.jpg
 

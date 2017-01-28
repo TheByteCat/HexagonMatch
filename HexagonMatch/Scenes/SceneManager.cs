@@ -14,8 +14,6 @@ namespace HexagonMatch.Scenes
         Scene currentScene;
         SceneTitle sceneTitle;
         Scene[] scenes;
-        Screen screen;
-        InputState input = new InputState();
 
         internal Scene CurrentScene
         {
@@ -30,23 +28,29 @@ namespace HexagonMatch.Scenes
             }
         }
 
+        public Screen Screen { get; private set;}
+
+        public InputState Input { get; private set; }
+
         public delegate void sceneChangeDelegate(SceneTitle prevScene, SceneTitle newScene);
         public event sceneChangeDelegate SceneChanged;
 
         public SceneManager(MainGame game, SpriteBatch spriteBatch, Point virtualScreenSize, SceneTitle startScene) : base(game)
         {
+            Screen = new Screen(game, virtualScreenSize.X, virtualScreenSize.Y);
+            Input = new InputState();
+            Input.Screen = Screen;
+
             scenes = new Scene[Enum.GetNames(typeof(SceneTitle)).Length];
             scenes[(int)SceneTitle.Menu] = new MenuScene(game, spriteBatch);
             scenes[(int)SceneTitle.LevelSelectMenu] = new LevelSelectScene(game, spriteBatch);
             scenes[(int)SceneTitle.Level] = new LevelScene(game, spriteBatch);
             sceneTitle = startScene;
             currentScene = scenes[(int)startScene];
+            currentScene.Initialize();           
 
-            screen = new Screen(game, virtualScreenSize.X, virtualScreenSize.Y);
-            input.Screen = screen;
-
-            currentScene.Screen = screen;
-            currentScene.Input = input;
+            currentScene.Screen = Screen;
+            currentScene.Input = Input;
         }
 
         public void SceneChange(SceneTitle newScene)
@@ -57,22 +61,22 @@ namespace HexagonMatch.Scenes
                 SceneChanged?.Invoke(sceneTitle, newScene);
                 sceneTitle = newScene;
                 currentScene = scenes[(int)newScene];
-                currentScene.Screen = screen;
-                currentScene.Input = input;
+                currentScene.Screen = Screen;
+                currentScene.Input = Input;
                 currentScene.Initialize();
             }
         }
 
         public override void Update(GameTime gameTime)
         {
-            input.Update();
+            Input.Update();
             currentScene.Update(gameTime);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            screen.BeginDraw();
+            Screen.BeginDraw();
             currentScene.Draw(gameTime);
             base.Draw(gameTime);
         }

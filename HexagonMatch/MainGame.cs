@@ -34,7 +34,20 @@ namespace HexagonMatch
                 return baseFont;
             }
         }
-        public Scene CurrentScene { get { return sceneManager.CurrentScene; } }
+        public Scene CurrentScene { get { return SceneManager.CurrentScene; } }
+
+        internal SceneManager SceneManager
+        {
+            get
+            {
+                return sceneManager;
+            }
+
+            private set
+            {
+                sceneManager = value;
+            }
+        }
 
         public MainGame()
         {
@@ -76,9 +89,9 @@ namespace HexagonMatch
             // TODO: use this.Content to load your game content here
             baseFont = Content.Load<SpriteFont>("baseFont");
 
-            sceneManager = new SceneManager(this, spriteBatch, new Point(NormalWidth, NormalHeight), SceneTitle.Level);
+            SceneManager = new SceneManager(this, spriteBatch, new Point(NormalWidth, NormalHeight), SceneTitle.Level);
             FPSCounterComponent fps = new FPSCounterComponent(this, spriteBatch, baseFont);
-            Components.Add(sceneManager);
+            Components.Add(SceneManager);
             Components.Add(fps);                      
         }
 

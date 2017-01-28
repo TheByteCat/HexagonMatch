@@ -225,7 +225,7 @@ namespace HexagonMatch
             this.maxValue = maxValue;
             this.mapRadius = mapRadius;
             rand = new Random();
-            animator = new GridAnimator(this, 100f);
+            animator = new GridAnimator(this, 500f);
         }
 
         public void FieldCell(Hex hex)
@@ -345,12 +345,12 @@ namespace HexagonMatch
             {
                 if (selectedHex.Count > 2)
                 {
+                    NormalizeStart?.Invoke(this);
                     foreach (Hexagon h in selectedHex)
                     {
                         SetHexInfo(h.Hex, HexagonContent.Empty);
                         h.CurrentColor = Color.White;
-                    }
-                    NormalizeStart?.Invoke(this);
+                    }                    
                     Defreeze();
                     Normalize();
                     NormalizeEnd?.Invoke(this);

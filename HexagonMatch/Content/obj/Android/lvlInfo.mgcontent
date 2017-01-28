@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/levlInfo.jpg</SourceFile>
+  <SourceFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/lvlInfo.jpg</SourceFile>
   <SourceTime>2017-01-15T18:22:35.6732207+10:00</SourceTime>
-  <DestFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/levlInfo.xnb</DestFile>
-  <DestTime>2017-01-15T18:24:17.6028701+10:00</DestTime>
+  <DestFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/lvlInfo.xnb</DestFile>
+  <DestTime>2017-01-28T19:03:35.1759087+10:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2016-03-30T16:36:08+10:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

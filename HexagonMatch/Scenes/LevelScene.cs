@@ -42,10 +42,12 @@ namespace HexagonMatch.Scenes
             grid.HexagonTexture = game.Content.Load<Texture2D>("png_hexagon");
             grid.WallTexture = game.Content.Load<Texture2D>("wall");       
             scoreFont = game.Content.Load<SpriteFont>("score_font");
+            var lvlInfoFont = game.Content.Load<SpriteFont>("lvlInfoFont");
             fonTexture = game.Content.Load<Texture2D>("background_fhd");
             Texture2D forestTx = game.Content.Load<Texture2D>("forest4_background");
             Texture2D goblinTx = game.Content.Load<Texture2D>("goblin");
             Texture2D backBtnTexture = game.Content.Load<Texture2D>("restart_ico");
+            Texture2D lvlInfoTx = game.Content.Load<Texture2D>("lvlInfo");
             //
             location = new Location("Forest", forestTx);
             enemy = new Enemy("Goblin", goblinTx, 30);
@@ -59,6 +61,7 @@ namespace HexagonMatch.Scenes
             //LevelManagerLayout lvlInfoLayout = new LevelManagerLayout()
             gui = new GUIManager(game, spriteBatch);
             gui.MainLayout.AddWidget(restartBtn);
+            gui.MainLayout.AddLayout(new LevelManagerLayout(new Rectangle(0, 0, game.CurrentScreenSize.X / 3, game.CurrentScreenSize.Y / 5), lvlInfoTx, levelManager, lvlInfoFont));
             //game.Components.Add(gui);
         }
 
@@ -115,7 +118,7 @@ namespace HexagonMatch.Scenes
             grid.CopyMapToBuffer();
             grid.NormalizeStart += Grid_NormalizeStart;
 
-            levelManager = new LevelManager(game, grid, new LevelInfo(10, new LevelConditionInfo(HexagonElement.Brown, 10)));
+            levelManager = new LevelManager(game, grid, new LevelInfo(15, new LevelConditionInfo(HexagonElement.Brown, 10), new LevelConditionInfo(HexagonElement.Green, 15)));
             base.Initialize();
         }
 
