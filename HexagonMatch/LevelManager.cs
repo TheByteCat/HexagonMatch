@@ -112,18 +112,12 @@ namespace HexagonMatch
             }
         }
 
-        private void CheckProgress(Grid grid)
+        private void CheckProgress(object sender, GridNormalizeEventArgs e)
         {
-            int[] el = new int[5];
             bool complete = true;
-            foreach (Hexagon h in grid.SelectedHex)
-            {
-                if (h.Content.Element != HexagonElement.None)
-                    el[(int)h.Content.Element]++;
-            }
             foreach (LevelCondition c in conditions)
             {
-                c.Progress += el[(int)c.Info.Element];
+                c.Progress += e[c.Info.Element];
                 if (!c.Complete)
                     complete = false;
             }

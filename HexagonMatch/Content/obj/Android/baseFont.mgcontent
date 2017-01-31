@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/baseFont.spritefont</SourceFile>
-  <SourceTime>2017-01-26T17:05:53.8436486+10:00</SourceTime>
+  <SourceTime>2017-01-31T17:30:21.3593858+10:00</SourceTime>
   <DestFile>C:/Users/Igor/documents/visual studio 2015/Projects/HexagonMatch/HexagonMatch/Content/bin/Android/baseFont.xnb</DestFile>
-  <DestTime>2017-01-28T19:03:33.9592557+10:00</DestTime>
+  <DestTime>2017-01-31T17:30:24.2277559+10:00</DestTime>
   <Importer>FontDescriptionImporter</Importer>
   <ImporterTime>2016-03-30T16:36:08+10:00</ImporterTime>
   <Processor>FontDescriptionProcessor</Processor>

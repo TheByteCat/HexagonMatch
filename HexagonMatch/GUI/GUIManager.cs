@@ -28,7 +28,7 @@ namespace HexagonMatch.GUI
             }
         }
 
-        public GUIManager(MainGame game, SpriteBatch spriteBatch)
+        public GUIManager(SpriteBatch spriteBatch)
         {
             this.spriteBatch = spriteBatch;
             mainLayout = new Layout(new Rectangle(0, 0, MainGame.NormalWidth, MainGame.NormalHeight));

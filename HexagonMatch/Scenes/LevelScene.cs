@@ -10,7 +10,7 @@ namespace HexagonMatch.Scenes
     enum LevelType { Score = 0, Color }
 
 
-    class LevelScene : Scene
+    class LevelScene : Scene, IDisposable
     {
         LevelType type;
         Grid grid;
@@ -19,7 +19,7 @@ namespace HexagonMatch.Scenes
         Random rand;
         Texture2D fonTexture;
         SpriteFont scoreFont;
-        long score = 0;
+        //long score = 0;
         Rectangle gridArea, locationArea;
         Location location;
         Enemy enemy;
@@ -27,7 +27,7 @@ namespace HexagonMatch.Scenes
         
         private void RestartGrid()
         {
-            score = 0;
+            //score = 0;
             foreach (Hexagon h in grid.HexMap)
             {
                 if (h != null && h.Content.Type == HexagonType.Element)
@@ -59,7 +59,7 @@ namespace HexagonMatch.Scenes
                 RestartGrid();
             };
             //LevelManagerLayout lvlInfoLayout = new LevelManagerLayout()
-            gui = new GUIManager(game, spriteBatch);
+            gui = new GUIManager(spriteBatch);
             gui.MainLayout.AddWidget(restartBtn);
             gui.MainLayout.AddLayout(new LevelManagerLayout(new Rectangle(0, 0, game.CurrentScreenSize.X / 3, game.CurrentScreenSize.Y / 5), lvlInfoTx, levelManager, lvlInfoFont));
             //game.Components.Add(gui);
@@ -122,10 +122,10 @@ namespace HexagonMatch.Scenes
             base.Initialize();
         }
 
-        private void Grid_NormalizeStart(Grid grid)
+        private void Grid_NormalizeStart(object sender, GridNormalizeEventArgs e)
         {
-            score += grid.SelectedHex.Count * 5 * (grid.SelectedHex.Count - 2);
-            enemy.Hp -= grid.SelectedHex.Count;
+            //score += grid.SelectedHex.Count * 5 * (grid.SelectedHex.Count - 2);
+            enemy.Hp -= e.Count;
             if (enemy.Hp == 0)
             {
                 enemy.MaxHp *= 2;
@@ -148,10 +148,7 @@ namespace HexagonMatch.Scenes
 
         private void DebugDraw(GameTime gameTime)
         {
-            Vector2 scorePosition = new Vector2(game.CurrentScreenSize.X - scoreFont.MeasureString(gameTime.ElapsedGameTime.TotalSeconds.ToString()).X - 10, 5);
-            spriteBatch.Begin();
-            spriteBatch.DrawString(scoreFont, gameTime.ElapsedGameTime.TotalSeconds.ToString(), scorePosition, Color.White);
-            spriteBatch.End();
+
         }
 
         public override void Draw(GameTime gameTime)
@@ -173,13 +170,13 @@ namespace HexagonMatch.Scenes
             string enemyHpStr = enemy.Hp.ToString() + " / " + enemy.MaxHp;
             Vector2 size = game.BaseFont.MeasureString(enemyHpStr);
             //Vector2 enemyHpPos = new Vector2(locationArea.X + (locationArea.Width / 2 - size.X / 2), locationArea.Y + locationArea.Height - size.Y);
-            Vector2 enemyHpPos = new Vector2(enemyPos.X + (enemy.Texture.Width / 2 - size.X / 2), enemyPos.Y + enemy.Texture.Height * + size.Y);
+            Vector2 enemyHpPos = new Vector2(enemyPos.X + (enemy.Texture.Width / 2 - size.X / 2), enemyPos.Y + enemy.Texture.Height + size.Y);
             spriteBatch.DrawString(game.BaseFont, enemyHpStr, enemyHpPos, Color.Maroon);
-            
+
 
             grid.Draw(spriteBatch, game.BaseFont);//Draw hexagon grid
             //DebugDraw(gameTime);
-            gui.Draw(gameTime);
+            gui.Draw(gameTime);            
 
             spriteBatch.End();
             base.Draw(gameTime);
@@ -188,6 +185,12 @@ namespace HexagonMatch.Scenes
         public override void Close()
         {
             base.Close();
+        }
+
+        public void Dispose()
+        {
+            fonTexture.Dispose();
+            levelManager.Dispose();
         }
     }
 }

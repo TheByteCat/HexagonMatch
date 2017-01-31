@@ -42,7 +42,7 @@ namespace HexagonMatch
 
         static public int Direction(Hex a, Hex b)
         {
-            Hex h = Subtract(b, a);
+            Hex h = Subtract(b, a); //-V3066
             return directions.IndexOf(h);
         }
 

@@ -47,7 +47,7 @@ namespace HexagonMatch.Scenes
             scenes[(int)SceneTitle.Level] = new LevelScene(game, spriteBatch);
             sceneTitle = startScene;
             currentScene = scenes[(int)startScene];
-            currentScene.Initialize();           
+            //currentScene.Initialize();           
 
             currentScene.Screen = Screen;
             currentScene.Input = Input;

@@ -20,14 +20,14 @@ namespace HexagonMatch
         Random rand;
         GridAnimator animator;
         static float Sqrt3 = (float)Math.Sqrt(3);
-        Texture2D hexagonTexture, wallTexture;
+        Texture2D wallTexture;
         //public static Color[] colors = { Color.LightSkyBlue, Color.SeaGreen, Color.White, Color.MediumTurquoise, Color.Aqua, Color.LightGreen };
         public static Texture2D Elements;
 
-        public delegate void normalizeStartDelegat(Grid grid);
+        public delegate void normalizeStartDelegat(object sender, GridNormalizeEventArgs e);
         public event normalizeStartDelegat NormalizeStart;
-        public delegate void normalizeEndDelegat(Grid grid);
-        public event normalizeEndDelegat NormalizeEnd;
+        //public delegate void normalizeEndDelegat(Grid grid);
+        //public event normalizeEndDelegat NormalizeEnd;
 
         public Vector2 Center
         {
@@ -38,10 +38,10 @@ namespace HexagonMatch
         {
             get
             {
-                return new Vector2((2.0f * HexagonSize) / hexagonTexture.Width, (Sqrt3 * HexagonSize) / hexagonTexture.Height);
+                return new Vector2((2.0f * HexagonSize) / HexagonTexture.Width, (Sqrt3 * HexagonSize) / HexagonTexture.Height);
             }
         }
-        public short HexagonSize { get { return hexagonSize; }}
+        public short HexagonSize { get { return hexagonSize; } }
         internal Hexagon[,] HexMap
         {
             get
@@ -54,18 +54,7 @@ namespace HexagonMatch
                 hexMap = value;
             }
         }
-        public Texture2D HexagonTexture
-        {
-            get
-            {
-                return hexagonTexture;
-            }
-
-            set
-            {
-                hexagonTexture = value;
-            }
-        }
+        public Texture2D HexagonTexture { get; set; }
         public Texture2D WallTexture
         {
             get
@@ -108,7 +97,7 @@ namespace HexagonMatch
             {
                 mapRadius = value;
             }
-        }        
+        }
 
         public static Rectangle ElementSource(int index)
         {
@@ -290,25 +279,38 @@ namespace HexagonMatch
 
         private void Defreeze()
         {
-            foreach(Hexagon h in selectedHex)
+            foreach (Hexagon h in selectedHex)
             {
                 for (int i = 0; i < 5; i++)
                 {
                     Hexagon temp = GetHexagonByHex(Hex.Neighbor(h.Hex, i));
-                    if(temp != null)
+                    if (temp != null)
                         temp.Content.Frozen = false;
                 }
             }
         }
 
         private bool IsValidNextHexagon(Hexagon h)
-        {            
+        {
             return (h != lastHexagon) &&
                 Hexagon.IsNeighbor(lastHexagon, h) &&
                 h.Content.Type == HexagonType.Element &&
                 h.Content.Element == lastHexagon.Content.Element &&
                 !selectedHex.Contains(h) &&
                 !h.Content.Frozen;
+        }
+
+        private GridNormalizeEventArgs StepResult()
+        {
+            int[] el = new int[5];
+            foreach (Hexagon h in SelectedHex)
+            {
+                if (h.Content.Element != HexagonElement.None)
+                    el[(int)h.Content.Element]++;
+            }
+            var e = new GridNormalizeEventArgs();
+            e.ElementsAmount = el;
+            return e;
         }
 
         private void InputHandling(TouchCollection touch)
@@ -345,15 +347,15 @@ namespace HexagonMatch
             {
                 if (selectedHex.Count > 2)
                 {
-                    NormalizeStart?.Invoke(this);
+                    NormalizeStart?.Invoke(this, StepResult());
                     foreach (Hexagon h in selectedHex)
                     {
                         SetHexInfo(h.Hex, HexagonContent.Empty);
                         h.CurrentColor = Color.White;
-                    }                    
+                    }
                     Defreeze();
                     Normalize();
-                    NormalizeEnd?.Invoke(this);
+                    //NormalizeEnd?.Invoke(this);
                 }
                 else
                 {
@@ -381,10 +383,10 @@ namespace HexagonMatch
             {
                 if (h != null)
                 {
-                    spriteBatch.Draw(hexagonTexture, position: h.Position, scale: h.Scale, color: h.CurrentColor);
+                    spriteBatch.Draw(HexagonTexture, position: h.Position, scale: h.Scale, color: h.CurrentColor);
                     for (int i = 0; i < 6; i++)
                     {
-                        if(h.HaveWall(i))
+                        if (h.HaveWall(i))
                         {
                             spriteBatch.Draw(wallTexture, position: h.Center, rotation: -i * (float)Math.PI / 3.0f, scale: h.Scale, color: Color.White);
                         }
@@ -394,14 +396,31 @@ namespace HexagonMatch
                         spriteBatch.Draw(Elements,
                             position: h.Center - new Vector2(Elements.Height / 2.0f) * h.Scale,
                             sourceRectangle: ElementSource(h.Content.Element),
-                            scale: h.Scale, 
+                            scale: h.Scale,
                             color: Color.White);
                     }
                 }
-            }            
+            }
             //spriteBatch.End();
             animator.Draw(spriteBatch);
         }
 
+    }
+
+    class GridNormalizeEventArgs : EventArgs
+    {
+        public int Count { get { return ElementsAmount.Sum(); } }
+        public int[] ElementsAmount { get; set; }
+
+        public int this[HexagonElement index]
+        {
+            get
+            {
+                if (ElementsAmount != null)
+                    return index != HexagonElement.None ? ElementsAmount[(int)index] : -1;
+                else
+                    return -1;
+            }
+        }
     }
 }
